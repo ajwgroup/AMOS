@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <PackageId>AMOS</PackageId>
+    <Authors>Digital Engineering</Authors>
+    <Company>AJW Aviation Ltd</Company>
+    <Description>Provides serializable classes and utilities for various Swiss-AS AMOS Aim interfaces</Description>
+    <Copyright>AJW Aviation Ltd</Copyright>
+    <RepositoryUrl>https://github.com/ajwgroup/AMOS</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/ajwgroup/AMOS</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/ajwgroup/AMOS/blob/master/LICENSE</PackageLicenseUrl>
+  </PropertyGroup>
+
+</Project>
