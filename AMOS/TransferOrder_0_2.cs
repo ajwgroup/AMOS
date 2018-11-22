@@ -76,9 +76,9 @@ namespace AMOS
 
         private string orgOrderNumberField;
 
-        private orderHeaderType orderHeaderField;
+        private OrderHeaderType orderHeaderField;
 
-        private orderDetailType[] orderDetailField;
+        private OrderDetailType[] orderDetailField;
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("orderNumber", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
@@ -109,8 +109,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public orderHeaderType orderHeader
+        [System.Xml.Serialization.XmlElementAttribute("orderHeader", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public OrderHeaderType OrderHeader
         {
             get
             {
@@ -124,7 +124,7 @@ namespace AMOS
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("orderDetail", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public orderDetailType[] orderDetail
+        public OrderDetailType[] OrderDetail
         {
             get
             {
@@ -142,7 +142,8 @@ namespace AMOS
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class orderHeaderType
+    [System.Xml.Serialization.XmlRootAttribute("orderHeader", Namespace = "", IsNullable = false)]
+    public partial class OrderHeaderType
     {
 
         private string orderTypeField;
@@ -163,19 +164,19 @@ namespace AMOS
 
         private string orderClosingDateField;
 
-        private amosAddressType releaseSignField;
+        private AmosAddressType releaseSignField;
 
-        private amosAddressType masterSignField;
+        private AmosAddressType masterSignField;
 
-        private amosAddressType orderResponsibleField;
+        private AmosAddressType orderResponsibleField;
 
-        private amosAddressType orderMandatorField;
+        private AmosAddressType orderMandatorField;
 
-        private amosAddressType orderVendorField;
+        private AmosAddressType orderVendorField;
 
-        private orderHeaderTypeAddressing addressingField;
+        private OrderHeaderTypeAddressing addressingField;
 
-        private amosAddressType aogDeskEmployeeField;
+        private AmosAddressType aogDeskEmployeeField;
 
         private string parentOrderField;
 
@@ -185,7 +186,7 @@ namespace AMOS
 
         private string entityCodeField;
 
-        private orderHeaderTypeDeliveryCondition deliveryConditionField;
+        private OrderHeaderTypeDeliveryCondition deliveryConditionField;
 
         private orderHeaderTypeShipmentCondition shipmentConditionField;
 
@@ -328,8 +329,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType releaseSign
+        [System.Xml.Serialization.XmlElementAttribute("releaseSign", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType ReleaseSign
         {
             get
             {
@@ -342,8 +343,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType masterSign
+        [System.Xml.Serialization.XmlElementAttribute("masterSign", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType MasterSign
         {
             get
             {
@@ -356,8 +357,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType orderResponsible
+        [System.Xml.Serialization.XmlElementAttribute("orderResponsible", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType OrderResponsible
         {
             get
             {
@@ -370,8 +371,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType orderMandator
+        [System.Xml.Serialization.XmlElementAttribute("orderMandator", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType OrderMandator
         {
             get
             {
@@ -384,8 +385,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType orderVendor
+        [System.Xml.Serialization.XmlElementAttribute("orderVendor", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType OrderVendor
         {
             get
             {
@@ -398,8 +399,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public orderHeaderTypeAddressing addressing
+        [System.Xml.Serialization.XmlElementAttribute("addressing", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public OrderHeaderTypeAddressing Addressing
         {
             get
             {
@@ -412,8 +413,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType aogDeskEmployee
+        [System.Xml.Serialization.XmlElementAttribute("aogDeskEmployee", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType AogDeskEmployee
         {
             get
             {
@@ -482,8 +483,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public orderHeaderTypeDeliveryCondition deliveryCondition
+        [System.Xml.Serialization.XmlElementAttribute("deliveryCondition", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public OrderHeaderTypeDeliveryCondition DeliveryCondition
         {
             get
             {
@@ -600,7 +601,8 @@ namespace AMOS
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class amosAddressType
+    [System.Xml.Serialization.XmlRootAttribute("amosAddressType", Namespace = "", IsNullable = false)]
+    public partial class AmosAddressType
     {
 
         private string codeField;
@@ -622,8 +624,8 @@ namespace AMOS
         private amosAddressTypeAccountNumbers accountNumbersField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string code
+        [System.Xml.Serialization.XmlElementAttribute("code", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Code
         {
             get
             {
@@ -636,8 +638,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string name
+        [System.Xml.Serialization.XmlElementAttribute("name", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Name
         {
             get
             {
@@ -650,8 +652,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string contactName
+        [System.Xml.Serialization.XmlElementAttribute("contactName", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string ContactName
         {
             get
             {
@@ -664,8 +666,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string address
+        [System.Xml.Serialization.XmlElementAttribute("address", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Address
         {
             get
             {
@@ -678,8 +680,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string city
+        [System.Xml.Serialization.XmlElementAttribute("city", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string City
         {
             get
             {
@@ -692,8 +694,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string zipCode
+        [System.Xml.Serialization.XmlElementAttribute("zipCode", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string ZipCode
         {
             get
             {
@@ -706,8 +708,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string country
+        [System.Xml.Serialization.XmlElementAttribute("country", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Country
         {
             get
             {
@@ -814,7 +816,7 @@ namespace AMOS
     public partial class overviewInformationType
     {
 
-        private amosReferenceTransferPart partNumberField;
+        private AmosReferenceTransferPart partNumberField;
 
         private string serialNumberField;
 
@@ -823,8 +825,8 @@ namespace AMOS
         private string aircraftRegistrationField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosReferenceTransferPart partNumber
+        [System.Xml.Serialization.XmlElementAttribute("partNumber", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosReferenceTransferPart PartNumber
         {
             get
             {
@@ -837,8 +839,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string serialNumber
+        [System.Xml.Serialization.XmlElementAttribute("serialNumber", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string SerialNumber
         {
             get
             {
@@ -851,8 +853,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string date
+        [System.Xml.Serialization.XmlElementAttribute("date", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Date
         {
             get
             {
@@ -865,8 +867,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string aircraftRegistration
+        [System.Xml.Serialization.XmlElementAttribute("aircraftRegistration", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string AircraftRegistration
         {
             get
             {
@@ -884,7 +886,8 @@ namespace AMOS
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class amosReferenceTransferPart
+    [System.Xml.Serialization.XmlRootAttribute("amosReferenceTransferPart", Namespace = "", IsNullable = false)]
+    public partial class AmosReferenceTransferPart
     {
 
         private string baseField;
@@ -893,7 +896,7 @@ namespace AMOS
 
         private string valueField;
 
-        public amosReferenceTransferPart()
+        public AmosReferenceTransferPart()
         {
             this.baseField = "transferPartDefinition";
         }
@@ -946,7 +949,8 @@ namespace AMOS
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class orderDetailType
+    [System.Xml.Serialization.XmlRootAttribute("orderDetail", Namespace = "", IsNullable = false)]
+    public partial class OrderDetailType
     {
 
         private string positionField;
@@ -965,7 +969,7 @@ namespace AMOS
 
         private string detailTextField;
 
-        private amosReferenceTransferPart partNumberField;
+        private AmosReferenceTransferPart partNumberField;
 
         private string serialNumberField;
 
@@ -1044,8 +1048,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string aircraftRegistration
+        [System.Xml.Serialization.XmlElementAttribute("aircraftRegistration", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string AircraftRegistration
         {
             get
             {
@@ -1142,8 +1146,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosReferenceTransferPart partNumber
+        [System.Xml.Serialization.XmlElementAttribute("partNumber", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosReferenceTransferPart PartNumber
         {
             get
             {
@@ -2102,13 +2106,13 @@ namespace AMOS
     public partial class orderDetailTypeDetailInformation
     {
 
-        private amosAddressType detailCreatorField;
+        private AmosAddressType detailCreatorField;
 
         private string detailCreationDateField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType detailCreator
+        [System.Xml.Serialization.XmlElementAttribute("detailCreator", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType DetailCreator
         {
             get
             {
@@ -2642,20 +2646,21 @@ namespace AMOS
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class orderHeaderTypeAddressing
+    [System.Xml.Serialization.XmlRootAttribute("addressing", Namespace = "", IsNullable = false)]
+    public partial class OrderHeaderTypeAddressing
     {
 
-        private amosAddressType shipmentAddressField;
+        private AmosAddressType shipmentAddressField;
 
-        private amosAddressType billingAddressField;
+        private AmosAddressType billingAddressField;
 
-        private amosAddressType issuerAddressField;
+        private AmosAddressType issuerAddressField;
 
-        private amosAddressType shipViaAddressField;
+        private AmosAddressType shipViaAddressField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType shipmentAddress
+        [System.Xml.Serialization.XmlElementAttribute("shipmentAddress", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType ShipmentAddress
         {
             get
             {
@@ -2668,8 +2673,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType billingAddress
+        [System.Xml.Serialization.XmlElementAttribute("billingAddress", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType BillingAddress
         {
             get
             {
@@ -2682,8 +2687,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType issuerAddress
+        [System.Xml.Serialization.XmlElementAttribute("issuerAddress", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType IssuerAddress
         {
             get
             {
@@ -2696,8 +2701,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType shipViaAddress
+        [System.Xml.Serialization.XmlElementAttribute("shipViaAddress", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType ShipViaAddress
         {
             get
             {
@@ -2716,7 +2721,8 @@ namespace AMOS
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class orderHeaderTypeDeliveryCondition
+    [System.Xml.Serialization.XmlRootAttribute("orderHeaderTypeDeliveryCondition", Namespace = "", IsNullable = false)]
+    public partial class OrderHeaderTypeDeliveryCondition
     {
 
         private string codeField;
@@ -2724,8 +2730,8 @@ namespace AMOS
         private string descriptionField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string code
+        [System.Xml.Serialization.XmlElementAttribute("code", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Code
         {
             get
             {
@@ -2738,8 +2744,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string description
+        [System.Xml.Serialization.XmlElementAttribute("description", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string Description
         {
             get
             {
@@ -2849,7 +2855,7 @@ namespace AMOS
 
         private orderHeaderTypePoolingPoolReason poolReasonField;
 
-        private amosAddressType poolParticipantField;
+        private AmosAddressType poolParticipantField;
 
         private string poolAircraftTypeField;
 
@@ -2886,8 +2892,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType poolParticipant
+        [System.Xml.Serialization.XmlElementAttribute("poolParticipant", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType PoolParticipant
         {
             get
             {
@@ -3195,7 +3201,7 @@ namespace AMOS
     public partial class orderHeaderTypeOrderInformation
     {
 
-        private amosAddressType orderCreatorField;
+        private AmosAddressType orderCreatorField;
 
         private string orderCreationDateField;
 
@@ -3204,8 +3210,8 @@ namespace AMOS
         private string printCountOrderManagementField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public amosAddressType orderCreator
+        [System.Xml.Serialization.XmlElementAttribute("orderCreator", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public AmosAddressType OrderCreator
         {
             get
             {

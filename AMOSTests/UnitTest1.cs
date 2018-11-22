@@ -18,6 +18,34 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void TransferOrderFromXmlOrderHeader_PassesFile_ReturnsExpectedValueForOrder()
+        {
+            var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
+            Assert.AreEqual("EXW", transferOrder.Payload.TransferOrder.Orders.First().OrderHeader.DeliveryCondition.Code);
+        }
+
+        [TestMethod]
+        public void TransferOrderFromXmlPart_PassesFile_ReturnsExpectedValueForOrder()
+        {
+            var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
+            Assert.AreEqual("D31865-111", transferOrder.Payload.TransferOrder.Orders.First().OrderDetail.First().PartNumber.Value);
+        }
+
+        [TestMethod]
+        public void TransferOrderFromXmlAircraftReg_PassesFile_ReturnsExpectedValueForOrder()
+        {
+            var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
+            Assert.AreEqual("Z-ZZZZ", transferOrder.Payload.TransferOrder.Orders.First().OrderDetail.First().AircraftRegistration);
+        }
+
+        [TestMethod]
+        public void TransferOrderFromXmlAddressing_PassesFile_ReturnsExpectedValueForOrder()
+        {
+            var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
+            Assert.AreEqual("AJWMAIN", transferOrder.Payload.TransferOrder.Orders.First().OrderHeader.Addressing.ShipmentAddress.Code);
+        }
+
+        [TestMethod]
         public void TransferPartFromXml_PassesFile_ReturnsExpectedValueForOrder()
         {
             var transferPart = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_PART_D31865-111.xml")));
