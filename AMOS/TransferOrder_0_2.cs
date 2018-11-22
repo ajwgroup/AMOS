@@ -1300,8 +1300,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string targetDate
+        [System.Xml.Serialization.XmlElementAttribute("targetDate", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string TargetDate
         {
             get
             {
@@ -1314,8 +1314,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string targetTime
+        [System.Xml.Serialization.XmlElementAttribute("targetTime", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string TargetTime
         {
             get
             {
