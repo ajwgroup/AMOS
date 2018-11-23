@@ -203,8 +203,8 @@ namespace AMOS
         private surchargesTypeSurcharge[] surchargesField;
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string orderType
+        [System.Xml.Serialization.XmlElementAttribute("orderType", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string OrderType
         {
             get
             {
@@ -217,8 +217,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string orderState
+        [System.Xml.Serialization.XmlElementAttribute("orderState", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string OrderState
         {
             get
             {
@@ -231,8 +231,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified, DataType = "integer")]
-        public string orderStatus
+        [System.Xml.Serialization.XmlElementAttribute("orderStatus", Form = System.Xml.Schema.XmlSchemaForm.Unqualified, DataType = "integer")]
+        public string OrderStatus
         {
             get
             {
@@ -259,8 +259,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string orderText
+        [System.Xml.Serialization.XmlElementAttribute("orderText", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string OrderText
         {
             get
             {
@@ -273,8 +273,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string orderPriority
+        [System.Xml.Serialization.XmlElementAttribute("orderPriority", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string OrderPriority
         {
             get
             {
@@ -455,8 +455,8 @@ namespace AMOS
         }
 
         /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string orderCurrency
+        [System.Xml.Serialization.XmlElementAttribute("orderCurrency", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string OrderCurrency
         {
             get
             {

@@ -44,8 +44,7 @@ namespace AMOSTests
             var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
             Assert.AreEqual("2018-06-11", transferOrder.Payload.TransferOrder.Orders.First().OrderDetail.First().TargetDate);
         }
-
-        
+                
         [TestMethod]
         public void TransferOrderFromXmlAddressing_PassesFile_ReturnsExpectedValueForOrder()
         {
