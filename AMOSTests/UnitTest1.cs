@@ -44,7 +44,14 @@ namespace AMOSTests
             var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
             Assert.AreEqual("2018-06-11", transferOrder.Payload.TransferOrder.Orders.First().OrderDetail.First().TargetDate);
         }
-                
+
+        [TestMethod]
+        public void TransferOrderFromXmlTargetDateConvetToDateTime_PassesFile_ReturnsExpectedValueForOrder()
+        {
+            var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
+            Assert.AreEqual(DateTime.Parse("11/06/2018 00:00:00"), DateTime.ParseExact(transferOrder.Payload.TransferOrder.Orders.First().OrderDetail.First().TargetDate, "yyyy-MM-dd", null));
+        }
+
         [TestMethod]
         public void TransferOrderFromXmlAddressing_PassesFile_ReturnsExpectedValueForOrder()
         {
