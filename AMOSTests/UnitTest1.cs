@@ -1,6 +1,7 @@
 using AMOS;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -49,7 +50,7 @@ namespace AMOSTests
         public void TransferOrderFromXmlTargetDateConvetToDateTime_PassesFile_ReturnsExpectedValueForOrder()
         {
             var transferOrder = AmosTransportEnvelope.FromXml(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER.xml")));
-            Assert.AreEqual(DateTime.Parse("11/06/2018 00:00:00"), DateTime.ParseExact(transferOrder.Payload.TransferOrder.Orders.First().OrderDetail.First().TargetDate, "yyyy-MM-dd", null));
+            Assert.AreEqual(DateTime.Parse("11/06/2018 00:00:00", new CultureInfo("en-GB")), DateTime.ParseExact(transferOrder.Payload.TransferOrder.Orders.First().OrderDetail.First().TargetDate, "yyyy-MM-dd", null));
         }
 
         [TestMethod]
