@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="amosTransportEnvelope">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="header">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element type="xs:string" name="senderID"/>
+              <xs:element type="xs:string" name="receiverID"/>
+              <xs:element name="date">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:dateTime">
+                      <xs:attribute type="xs:string" name="timezone"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="payload">
+          <xs:complexType>
+            <xs:annotation>
+			<xs:documentation>Payload type</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any processContents="skip" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Identifier of the payload, used to build and validate the digital signature.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Type of the included payload. E.g. transferAircraft for A/C-data. Only valid AMOS-schema-types can be used here.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="version" type="xs:string"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute type="xs:float" name="version"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+

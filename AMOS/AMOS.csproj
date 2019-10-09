@@ -12,4 +12,32 @@
     <PackageLicenseUrl>https://github.com/ajwgroup/AMOS/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Models\12-10-067\**" />
+    <Compile Remove="Models\12-20-054\**" />
+    <Compile Remove="Models\19.12-preview19\**" />
+    <Compile Remove="Models\19.6.18\**" />
+    <EmbeddedResource Remove="Models\12-10-067\**" />
+    <EmbeddedResource Remove="Models\12-20-054\**" />
+    <EmbeddedResource Remove="Models\19.12-preview19\**" />
+    <EmbeddedResource Remove="Models\19.6.18\**" />
+    <None Remove="Models\12-10-067\**" />
+    <None Remove="Models\12-20-054\**" />
+    <None Remove="Models\19.12-preview19\**" />
+    <None Remove="Models\19.6.18\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Models\TRANSFER_PART\transferPart_0_14.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Models\TRANSFER_PART_DEFINITION\v1_0\" />
+    <Folder Include="Models\TRANSFER_PART_DEFINITION\v1_1\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Models\TRANSFER_PART\v0_14\transferPart_0_14.cs" />
+  </ItemGroup>
+
 </Project>
