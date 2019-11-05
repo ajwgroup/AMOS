@@ -33,7 +33,6 @@
 
   <ItemGroup>
     <Folder Include="Models\TRANSFER_PART_DEFINITION\v1_0\" />
-    <Folder Include="Models\TRANSFER_PART_DEFINITION\v1_1\" />
   </ItemGroup>
 
   <ItemGroup>

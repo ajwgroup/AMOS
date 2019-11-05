@@ -17,10 +17,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="TRANSFER_ORDER.xml">
+    <None Update="TRANSFER_ORDER_0_14.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TRANSFER_ORDER_1_2.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="TRANSFER_PART_D31865-111.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TRANSFER_PART_DEFINITION_6773E010000.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

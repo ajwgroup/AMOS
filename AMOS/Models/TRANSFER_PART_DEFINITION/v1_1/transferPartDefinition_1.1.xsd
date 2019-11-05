@@ -1,0 +1,1056 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2005 (VECH) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 0.1
+28/07/2006 - Introduced version 2006.1
+28/07/2006 - Changed all elements of type xs:dateTime to type xs:date.
+           - Renamed schema from PARTUPLOAD to TRANSFER_PART.
+04/10/2006 - Introduced SIMPLEDATEType
+04/12/2006 - moved to w3c-notation
+10/01/2006 - moved to envelope-style, new versioning
+17/04/2007 - added internationalCurrencyCode for pricing information.
+??/05/2007 - added defaultRemarks.
+16/05/2007 - added reference from rotable requirement to part requirement. Referential integrity
+06/06/2007 - added data: part location list,waste code, special contract, rotable delivery date, release no, pool processor, print on EASA form, ...
+13/06/2007 - added many minLength maxLength facets. Several new simple types created.
+14/06/2007 - included AmosCommonTypes.xsd
+14/06/2007 - removed include AmosCommonTypes.xsd. Copied needed types to here.
+
+Version 0.11
+20/09/2009 - Set maxLength of location field from 8 to 12.
+20/11/2009 - Set maxLength of owner and defaultRepair field from 8 to 12.
+10/05/2010 - Changed <materialType> to be optional. It's only optional for materialClass S (Service type)
+
+Version 0.13
+16/11/2011 - VECH - added commodity codes.
+
+Version 0.14
+08/06/2012 - YJME - added entity information
+16/10/2012 - YJME - set handle of requirements levels (part and rotables) as deprecated since 10.10 (due to refactoring of requirements and intervals management)
+11/10/2013 - XCOI - added field mappings
+
+Version 0.15
+11/10/2013 - XCOI - enlarged fields <wasteCode> from 4 to 8, <poolProcessor> from 8 to 12, <dimension> and <specialDimension> from 2 to 10, <pos> from 14 to 16, <location> from 12 to 16.
+
+Version 1.0
+05/12/2013 - YSRZ - split transferPart_0.15.xsd into two schemas: transferPartDefinition_1.0.xsd and transferRotable_1.0.xsd (not yet available). Removed unused fields: <orgPartNumber>. Removed <requirementList> and <rotableList>. Renamed <vendor>/<name> to <vendor>/<code>. Rename <specialDimentions>/<specialDimension> to <specialCounters>/<specialCounterCode>. Added <entityInformation>/<functionalCurrency> and <pricing>/<functionalAeragePrice>, <pricing>/<functionalAvgRepairCost>. Fields made mandatory: <partHeader>.
+26/03/2014 - XCOI - added AMOS mime type annotations
+25/01/2017 - Enhanced database mappings
+
+Version 1.1 - AMOS 11.40
+05/05/2017 - Part numbers up to 32 characters are supported for the <partNumber> field.                                
+
+***AMOS_CHANGELOG_END***-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="0.1">
+	<xs:element name="transferPartDefinition">
+		<xs:annotation>
+			<xs:documentation>Root element for transferPartDefinition form.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="part" type="partType">
+					<xs:annotation>
+						<xs:documentation>Part to be exported/inserted/updated.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" use="required" fixed="1.1"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- COMMON TYPES -->
+	<!-- SIMPLE ISO8601 DATE -->
+	<xs:simpleType name="simpleDateType">
+		<xs:annotation>
+			<xs:documentation>Date type. ISO8601-date as string or empty string.</xs:documentation>
+			<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([12][0-9][0-9][0-9]\-((0[1-9])|(1[0-2]))\-((0[1-9])|([12][0-9])|([3][01])))?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- YES OR NO -->
+	<xs:simpleType name="yesNoType">
+		<xs:annotation>
+			<xs:documentation>Y=YES; N=NO.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y">
+				<xs:annotation>
+					<xs:documentation>YES.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="N">
+				<xs:annotation>
+					<xs:documentation>NO.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRIMITIVE TYPES -->
+	<xs:simpleType name="positiveInteger">
+		<xs:annotation>
+			<xs:documentation>Zero or positive integer</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="2147483647"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="double">
+		<xs:annotation>
+			<xs:documentation>Limited to 17 digits overall</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="17"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="positiveDouble">
+		<xs:annotation>
+			<xs:documentation>Zero or positive decimal number</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="17"/>
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- ATA CHAPTER -->
+	<xs:simpleType name="ataChapter">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="12"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- STATION -->
+	<xs:simpleType name="station">
+		<xs:annotation>
+			<xs:documentation>Max. 4 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- STORE -->
+	<xs:simpleType name="store">
+		<xs:annotation>
+			<xs:documentation>Max. 8 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- LOCATION -->
+	<xs:simpleType name="location">
+		<xs:annotation>
+			<xs:documentation>Max. 16 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="16"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- DESCRIPTION OR REMARK -->
+	<xs:simpleType name="description">
+		<xs:annotation>
+			<xs:documentation>A description or remark up to 36 characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="36"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- AC_TYPE -->
+	<xs:simpleType name="acSimpleType">
+		<xs:annotation>
+			<xs:documentation>Use for ac register number or ac type. Max. 6 characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- USER SIGN -->
+	<xs:simpleType name="userSignSimpleType">
+		<xs:annotation>
+			<xs:documentation>Any user sign. Max. 8 characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PARTNUMBER DEFINITION -->
+	<xs:simpleType name="partNumberType">
+		<xs:annotation>
+			<xs:documentation>Type for partnumbers: minLentgh=1; maxLength=32;</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--PARTSERIALNUMBER DEFINITION -->
+	<xs:simpleType name="partSerialNumberType">
+		<xs:annotation>
+			<xs:documentation>Type for part-serialnumbers: minLength=1; maxLength=20</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- COUNTER -->
+	<xs:simpleType name="counterCodeType">
+		<xs:annotation>
+			<xs:documentation>D=Days; H=Hours; C=Cycles; or Custom type. Must be up to 10 characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- MATERIAL CLASS DEFINITION -->
+	<xs:simpleType name="materialClassType">
+		<xs:annotation>
+			<xs:documentation>Type for material classes. R=Rotable; C=Consumable; S=Service; E=Expandable; or custom type (see basic table Material Class). Max. 4 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRICE TYPE DEFINITION -->
+	<xs:complexType name="priceType">
+		<xs:annotation>
+			<xs:documentation>Pricing information.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="double">
+				<xs:attribute name="internationalCurrencyCode" use="required">
+					<xs:annotation>
+						<xs:appinfo>
+							<xs:appinfo>AMOS_DATABASE=part_custom.currency</xs:appinfo>
+							<xs:appinfo>AMOS_DATABASE=entity_header.currency</xs:appinfo>
+							<xs:appinfo>AMOS_MIMETYPE=D_CURRENCY</xs:appinfo>
+							<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+						</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="3"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- COMMON TYPES finished-->
+	<xs:group name="acPos">
+		<xs:sequence>
+			<xs:element name="ac" type="acSimpleType">
+				<xs:annotation>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=rotables.ac_registr</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pos" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=rotables.location</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="16"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<xs:group name="stationStoreLocation">
+		<xs:sequence>
+			<xs:element name="station" type="station">
+				<xs:annotation>
+					<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=location.station</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="store" type="store" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=location.store</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_STORE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="location" type="location" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=location.location</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_LOCATION</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:group>
+	<!-- PART -->
+	<xs:complexType name="partType">
+		<xs:all>
+			<xs:element name="partNumber" type="partNumberType">
+				<xs:annotation>
+					<xs:documentation>Part number according to ATA.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part.partno</xs:appinfo>
+					<xs:documentation>On IMPORT it is always changed to upper case.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="partHeader" type="partHeaderType">
+				<xs:annotation>
+					<xs:documentation>Basic information about the part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="aircraftTypeList" type="aircraftTypeList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of aircraft-types the part can be installed in.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="positionList" type="positionList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of positions on an aircraft at which the part can be installed.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="vendorList" type="vendorList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of vendors of the part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="alternateList" type="alternateList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of alternates of the part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="classificationList" type="classificationList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of classifications for the part. (e.g. ENGINE, APU,DANGEROUS GOODS...)</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remarks" type="remarks" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of remarks to the part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="specialCounters" type="counterList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of non standard counters (different than H, C and D) defined for the part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="entityInformation" type="entityInformationType" minOccurs="0"/>
+			<xs:element name="pricing" type="pricing" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Pricing information for the part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="locationList" type="locationList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of locations where this part is stored.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="customsList" type="customsList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Collection of customs for the part.</xs:documentation>
+					<xs:documentation> EXPORT ONLY.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- REMARKS -->
+	<xs:complexType name="remarks">
+		<xs:all minOccurs="0">
+			<xs:element name="purchaseRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remarks for purchasing.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_remarks.text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="internalRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Internal remarks. (internal use.)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_description.text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="repairRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remarks for repair.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_remarks.text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="receivingRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remarks for receiving.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_remarks.text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pickslipRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remarks for pickslips.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_remarks.text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="defaultRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_remarks.text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="partRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>These remarks show up on main tabsheet in Part Administration.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.remarks</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!--COUNTER_LIST -->
+	<xs:complexType name="counterList">
+		<xs:sequence minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="specialCounterCode" type="counterCodeType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Counter's code.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=counter_definition.code</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!--commodity code list -->
+	<xs:complexType name="customsList">
+		<xs:sequence>
+			<xs:element name="customs" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="customsCode">
+							<xs:annotation>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=address.vendor</xs:appinfo>
+								<xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+								<xs:documentation>The code of the customs.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="12"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="commodityCode">
+							<xs:annotation>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=part_custom.commodity_code</xs:appinfo>
+								<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+								<xs:documentation>Commodity code for the customs.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- PRICING -->
+	<xs:complexType name="pricing">
+		<xs:all minOccurs="0">
+			<xs:element name="averagePrice" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Local average price of the part. Setting the Average Price is not allowed with FSV based Moving Average Price (when parameter 1532 is set to “Financial Stock Value Based Moving Average Price”).</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_fa_entity.average_price</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="functionalAveragePrice" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Functional average price of the part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_fa_entity.average_price_func</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="valueForCustoms" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Customs value of the part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_custom.value</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="avgRepairCost" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Local average costs for repair.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_fa_entity.avg_repair_cost</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="functionalAvgRepairCost" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Functional average costs for repair.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_fa_entity.avg_repair_cost_func</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="purchasePrice" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current price for purchasing. (Last order.)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_fa_entity.purch_price</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="salesPrice" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Price when selling the part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_fa_entity.sales_price</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- VENDOR_LIST -->
+	<xs:complexType name="vendorList">
+		<xs:sequence minOccurs="0">
+			<xs:element name="vendor" type="vendorType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Vendor the part can be bought at.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- VENDOR-->
+	<xs:complexType name="vendorType">
+		<xs:all minOccurs="0">
+			<xs:element name="code">
+				<xs:annotation>
+					<xs:documentation>The vendor's code.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part_vendor.vendor</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="description" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A closer description of the vendor.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_vendor.remarks</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- ALTERNATE_LIST -->
+	<xs:complexType name="alternateList">
+		<xs:sequence minOccurs="0">
+			<xs:element name="alternate" type="alternateType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- ALTERNATE-->
+	<xs:complexType name="alternateType">
+		<xs:all minOccurs="0">
+			<xs:element name="type">
+				<xs:annotation>
+					<xs:documentation>A=ALTERNATE PARTNUMBER (KNOWN P/N); F=FUTURE ALTERNATE (KNOWN P/N); P=PREVIOUS ALTERNATE (KNOWN P/N); R=REFERENCE PARTNUMBER (UNKNOWN P/N); S=SIMILAR PARTNUMBER (KNOWN P/N)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_alternate.type</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="alternatePartnumber" type="partNumberType">
+				<xs:annotation>
+					<xs:documentation>Part number of the alternate part. No check if alternate part number exists is done.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part_alternate.altpartno</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="twoWayInterchangeable" type="yesNoType">
+				<xs:annotation>
+					<xs:documentation>EXPORT: Flag indicating the two-way-interchangeability of an alternate part.</xs:documentation>
+					<xs:appinfo>AMOS_NO_DB</xs:appinfo>
+					<xs:documentation>IMPORT: if set to 'Y' and if 'type' is not set to 'R', relation from alternate part towards original part will be created.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="approvedBy" type="userSignSimpleType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Person that approved the alternate part.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part_alternate.approved_by</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="approvedAt" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date of approval.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_alternate.approved_date</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remark" type="description" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remark for the alternate part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_alternate.remarks</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- AIRCRAFT_TYPE_LIST -->
+	<xs:complexType name="aircraftTypeList">
+		<xs:sequence>
+			<xs:element name="aircraftType" type="aircraftType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- AIRCRAFT_TYPE -->
+	<xs:complexType name="aircraftType">
+		<xs:all>
+			<xs:element name="type" type="acSimpleType">
+				<xs:annotation>
+					<xs:documentation>Type of aircraft.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.ac_typ</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC_TYPE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="effectivity" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.effectivity</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="numberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Type of the given range. (E.g. Serialnumber, Linenumber, Productionnumber). Max. 2 characters.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.serialno_type</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="numberFrom" type="partSerialNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Start of the range. All numbers are given in their NUMBER_TYPE.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.serialno_from</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="numberTo" type="partSerialNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>End of the range. All numbers are given in their NUMBER_TYPE.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.serialno_to</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ipcReference" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reference to the "Internal Parts Catalog".</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.ipc_reference</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="quantityPerAc" type="positiveDouble" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Number of parts on an A/C of this type.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.qty_per_ac</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="mrRoute" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.mr_route</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="mrRemarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_type.mr_remarks</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- POSITION_LIST -->
+	<xs:complexType name="positionList">
+		<xs:sequence>
+			<xs:element name="position" type="positionType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- POSITION -->
+	<xs:complexType name="positionType">
+		<xs:all>
+			<xs:element name="acType" type="acSimpleType">
+				<xs:annotation>
+					<xs:documentation>Type of an aircraft.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC_TYPE</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part_ac_position.ac_typ</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="positionName">
+				<xs:annotation>
+					<xs:documentation>Name of the position at which the part can be installed.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_position.position</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="ataChapter" type="ataChapter">
+				<xs:annotation>
+					<xs:documentation>The position's ATA-chapter.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=G_ATA_CHAPTER_STR</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part_ac_position.ata_chapter</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="quantityPerPosition" type="positiveDouble" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Quantity of parts installed to the position.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_ac_position.qty_per_position</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- CLASSIFICATION_LIST -->
+	<xs:complexType name="classificationList">
+		<xs:sequence>
+			<xs:element name="classification" type="classificationType" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- CLASSIFICATION -->
+	<xs:complexType name="classificationType">
+		<xs:all>
+			<xs:element name="name">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_special.special</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=special.special</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:documentation>The name of the special. It will be changed to upper case.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="description" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=special.description</xs:appinfo>
+					<xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:documentation>Description of the special.</xs:documentation>
+					<xs:documentation>EXPORT ONLY.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remark" type="description" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_special.remarks</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:documentation>Remarks to the part special. It will be stored as upper case.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="reference" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_special.referenceno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amount" type="double" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part_special.amount</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- PART_HEADER -->
+	<xs:complexType name="partHeaderType">
+		<xs:all minOccurs="0">
+			<xs:element name="materialClass" type="materialClassType">
+				<xs:annotation>
+					<xs:documentation>R=Rotable; C=Consumable; S=Service; E=Expandable</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.mat_class</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=MAT_CLASS</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="externalClass" type="materialClassType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>I.E. C=Consumable, N=Non Aircraft part, P=Part... Must be filled except for materialClass=S (Service part)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.mat_type</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="mfgCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The part's manufacturer CAGE code. Max. 36 characters. Property "CC" in address.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=adr_properties.value</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="repairable" type="yesNoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Boolean flag indication of a repairable part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.repairable</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ataChapter" type="ataChapter" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_MIMETYPE=G_ATA_CHAPTER_STR</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part.ata_chapter</xs:appinfo>
+					<xs:documentation>ATA Chapter related to the exported part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="description" type="description" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Closer description of the part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.description</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="unitOfMeasurement" minOccurs="0">
+				<xs:annotation>
+					<xs:appinfo>AMOS_DATABASE=part.measure_unit</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_MEASURE_UNIT</xs:appinfo>
+					<xs:documentation>The unit in which phisical quantity of the exported part is measured.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="wasteCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>8 charater waste code. See basic table Waste Code.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.waste_code</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="specialContract" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Special contract 2 character code.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.special_contract</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="weight" type="positiveDouble" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Weight in kilograms.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.weight</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="countryOfOrigin" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Max. 4 character country code. See basic table Country.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.country_origin</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=COUNTRY</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="financialAccount" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cost center of financial aircraft-type.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.ac_typ</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC_TYPE</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="defaultRepair" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Default repair location.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=A_ADDRESS</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part.default_repair</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="defaultSupplier" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Default supplier for purchasing. Max.12 characters.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=A_ADDRESS</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=part.default_supplier</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="tool" type="yesNoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Is it a tool? Y or N</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part.tool</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- PART_UPLOAD -->
+	<xs:complexType name="locationType">
+		<xs:sequence>
+			<xs:element name="station" type="station">
+				<xs:annotation>
+					<xs:documentation>Station code.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=location.station</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="store" type="store">
+				<xs:annotation>
+					<xs:documentation>Store code.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=location.store</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_STORE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="location" type="location">
+				<xs:annotation>
+					<xs:documentation>Location code.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=location.location</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_LOCATION</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="main" type="yesNoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Is this a main part location?</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_location.is_main</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="maxQuantity" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Maximum quantity allowed on this location. </xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=part_location.max_qty</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="locationList">
+		<xs:sequence>
+			<xs:element name="location" type="locationType" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Location where the part is stored.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- entityInformationType -->
+	<xs:complexType name="entityInformationType">
+		<xs:sequence>
+			<xs:element name="entityCode">
+				<xs:annotation>
+					<xs:documentation>Unique code identifying the entity.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=entity_header.entity_code</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=F_ENTITY_CODE</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="currency">
+				<xs:annotation>
+					<xs:documentation>Local currency of the Entity.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=entity_header.currency</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_CURRENCY</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="functionalCurrency" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Functional currency of the Entity.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=entity_header.currency_func</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_CURRENCY</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
