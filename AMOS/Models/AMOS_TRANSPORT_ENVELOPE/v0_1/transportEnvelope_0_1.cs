@@ -23,7 +23,7 @@ namespace AMOS.Models.AMOS_TRANSPORT_ENVELOPE.v0_1
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     [System.Xml.Serialization.XmlRootAttribute(ElementName = "amosTransportEnvelope", Namespace = "", IsNullable = false)]
-    public partial class transportEnvelope_0_1
+    public partial class transportEnvelope_0_1 : ITransportEnvelope
     {
 
         private amosTransportEnvelopeHeader headerField;

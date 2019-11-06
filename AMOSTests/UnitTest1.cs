@@ -78,5 +78,15 @@ namespace AMOSTests
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_PART_DEFINITION_6773E010000.xml")));
             Assert.AreEqual("6773E010000", transportEnvelope.getPayload<transferPartDefinition_1_1>().part.First().partNumber);
         }
+
+        [TestMethod]
+        public void FromZip()
+        {
+            using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_0_14.zip"))
+            {
+                var transportEnvelope = EnvelopeUtils.FromZip<transportEnvelope_0_1>(fileStream);
+                Assert.AreEqual("2018-06-11", transportEnvelope.getPayload<transferOrder_0_14>().order.First().orderDetail.First().targetDate);
+            }
+        }
     }
 }
