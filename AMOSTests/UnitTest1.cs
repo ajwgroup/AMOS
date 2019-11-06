@@ -80,12 +80,22 @@ namespace AMOSTests
         }
 
         [TestMethod]
-        public void FromZip()
+        public void FromZip_PassZipWithTwoFiles_ReturnsTransferOrder()
         {
             using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_0_14.zip"))
             {
                 var transportEnvelope = EnvelopeUtils.FromZip<transportEnvelope_0_1>(fileStream);
-                Assert.AreEqual("2018-06-11", transportEnvelope.getPayload<transferOrder_0_14>().order.First().orderDetail.First().targetDate);
+                Assert.AreEqual("2018-06-11", transportEnvelope.FirstOrDefault(e => e.Key.Equals("TRANSFER_ORDER_0_14.xml")).Value.getPayload<transferOrder_0_14>().order.First().orderDetail.First().targetDate);
+            }
+        }
+
+        [TestMethod]
+        public void FromZip_PassZipWithTwoFiles_ReturnsTransferPart()
+        {
+            using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_0_14.zip"))
+            {
+                var transportEnvelope = EnvelopeUtils.FromZip<transportEnvelope_0_1>(fileStream);
+                Assert.AreEqual("D31865-111", transportEnvelope.FirstOrDefault(e => e.Key.Equals("TRANSFER_PART_D31865-111.xml")).Value.getPayload<transferPart_0_14>().part.First().partNumber);
             }
         }
     }

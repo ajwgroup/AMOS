@@ -17,23 +17,25 @@ namespace AMOS.Models.AMOS_TRANSPORT_ENVELOPE.v0_1
             return (T)serializer.Deserialize(memStream);
         }
 
-        public static T FromZip<T>(FileStream fileStream) where T : ITransportEnvelope
+        public static Dictionary<String,T> FromZip<T>(FileStream fileStream) where T : ITransportEnvelope
         {
+            var returnDictionary = new Dictionary<String, T>();
+
             using (var archive = new ZipArchive(fileStream))
             {
                 foreach(var entry in archive.Entries)
                 {
-                    if (!entry.Name.ToUpper().StartsWith("TRANSFER_ORDER") && !entry.Name.ToUpper().EndsWith(".XML"))
+                    if (!entry.Name.ToUpper().StartsWith("TRANSFER_") && !entry.Name.ToUpper().EndsWith(".XML"))
                         continue;
 
                     using (StreamReader sr = new StreamReader(entry.Open()))
                     {
-                        return FromXml<T>(Encoding.UTF8.GetBytes(sr.ReadToEnd()));
+                        returnDictionary.Add(entry.Name, FromXml<T>(Encoding.UTF8.GetBytes(sr.ReadToEnd())));
                     }
                 }
             }
 
-            throw new Exception("Cannot find valid TRANSFER_ORDER file");
+            return returnDictionary;
         }
     }
 }
