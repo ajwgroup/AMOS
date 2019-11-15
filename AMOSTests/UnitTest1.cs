@@ -98,5 +98,12 @@ namespace AMOSTests
                 Assert.AreEqual("D31865-111", transportEnvelope.FirstOrDefault(e => e.Key.Equals("TRANSFER_PART_D31865-111.xml")).Value.getPayload<transferPart_0_14>().part.First().partNumber);
             }
         }
+
+        [TestMethod]
+        public void FromZip_PassZipWithTwoFiles_ReturnsTransferShipment()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment.xml")));
+            Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.getPayload<transferShipment_1_1>().shipment.First().awbNumber);
+        }
     }
 }
