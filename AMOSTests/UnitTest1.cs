@@ -101,10 +101,17 @@ namespace AMOSTests
         }
 
         [TestMethod]
-        public void FromZip_PassZipWithTwoFiles_ReturnsTransferShipment()
+        public void FromXml_ReturnsTransferShipment()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment.xml")));
             Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.getPayload<transferShipment_1_1>().shipment.First().awbNumber);
+        }
+
+        [TestMethod]
+        public void FromXml_ReturnsImportOrderConfirmation()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("import_order_confirmation.xml")));
+            Assert.AreEqual("R1111111", transportEnvelope.getPayload<importOrderConfirmation_0_1>().orderConfirmation.First().orderNumber);
         }
     }
 }

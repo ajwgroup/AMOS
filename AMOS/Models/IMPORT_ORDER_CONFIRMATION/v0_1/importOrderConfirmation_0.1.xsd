@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2011 (VECH) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!--
+	Layout for the import of order confirmation. 
+-->
+<!-- ***AMOS_CHANGELOG_START***
+	Version 0.1
+		19/10/2011 - Created
+		21/03/2014 - completed AMOS mime type annotations
+***AMOS_CHANGELOG_END***-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="0.1">
+	<xs:element name="importOrderConfirmation">
+		<xs:annotation>
+			<xs:documentation>Root element for import of order confirmation.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="orderConfirmation" type="orderConfirmationType" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Confirmation for a whole order, with all it's details.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" use="required" fixed="0.1">
+				<xs:annotation>
+					<xs:documentation>Fixed! Value 0.1</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- order confirmation -->
+	<xs:complexType name="orderConfirmationType">
+		<xs:sequence>
+			<xs:element name="orderNumber">
+				<xs:annotation>
+					<xs:documentation>The document's order-number.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_IMPORT=od_header.orderno</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="remark" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remarks sent with the confirmation.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_IMPORT=od_header.header_remarks</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:choice>
+				<xs:element name="confirmedDate" type="xs:date">
+					<xs:annotation>
+						<xs:documentation>Confirmed date for the complete order.</xs:documentation>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_detail.confirmed_date</xs:appinfo>
+						<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:sequence>
+					<xs:element name="detailConfirmation" maxOccurs="unbounded">
+						<xs:annotation>
+							<xs:documentation>Detail level confirmations.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="position" type="xs:positiveInteger">
+									<xs:annotation>
+										<xs:documentation>Detail position to be confirmed.</xs:documentation>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_detail.posno</xs:appinfo>
+										<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="confirmedDate" type="xs:date">
+									<xs:annotation>
+										<xs:documentation>Confirmed date for the complete order.</xs:documentation>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_detail.confirmed_date</xs:appinfo>
+										<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+									</xs:annotation>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:sequence>
+			</xs:choice>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

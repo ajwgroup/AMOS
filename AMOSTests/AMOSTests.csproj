@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="import_order_confirmation.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TRANSFER_ORDER_0_14.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
