@@ -2,6 +2,7 @@ using AMOS;
 using AMOS.Models.AMOS_TRANSPORT_ENVELOPE.v0_1;
 using AMOS.Models.TRANSFER_ORDER.v0_14;
 using AMOS.Models.TRANSFER_PART.v0_14;
+using AMOS.Models.TRANSFER_SHIPMENT.v1_1;
 using AMOS.Models.TRANSFER_PART_DEFINITION.v1_1;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
