@@ -11,6 +11,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using AMOS.Models.IMPORT_ORDER_CONFIRMATION.v0_1;
 
 namespace AMOSTests
 {
