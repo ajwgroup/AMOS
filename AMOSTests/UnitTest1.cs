@@ -115,8 +115,22 @@ namespace AMOSTests
             Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.getPayload<transferShipment_1_1>().shipment.First().awbNumber);
         }
 
+        /*[TestMethod]
+        public void FromXml_ReturnsTransferShipment12()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment_1_2.xml")));
+            Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.getPayload<AMOS.Models.TRANSFER_SHIPMENT.v1_2.transferShipment_1_2>().shipment.First().shipmentHeader.awbNumber);
+        }*/
+
         [TestMethod]
         public void FromXml_ReturnsImportOrderConfirmation()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("import_order_confirmation.xml")));
+            Assert.AreEqual("R1111111", transportEnvelope.getPayload<importOrderConfirmation_0_1>().orderConfirmation.First().orderNumber);
+        }
+
+        [TestMethod]
+        public void FromXml_ReturnsImportOrderConfirmation2()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("import_order_confirmation.xml")));
             Assert.AreEqual("R1111111", transportEnvelope.getPayload<importOrderConfirmation_0_1>().orderConfirmation.First().orderNumber);
