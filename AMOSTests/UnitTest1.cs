@@ -119,7 +119,7 @@ namespace AMOSTests
         public void FromXml_ReturnsTransferShipment12()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment_1_2.xml")));
-            Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.getPayload<AMOS.Models.TRANSFER_SHIPMENT.v1_2.transferShipment_1_2>().shipment.First().shipmentHeader.awbNumber);
+            Assert.AreEqual("555111222", transportEnvelope.getPayload<AMOS.Models.TRANSFER_SHIPMENT.v1_2.transferShipment_1_2>().shipment.First().shipmentHeader.awbNumber);
         }*/
 
         [TestMethod]

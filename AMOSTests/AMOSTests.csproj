@@ -35,9 +35,6 @@
     <None Update="TRANSFER_PART_DEFINITION_6773E010000.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="transfer_shipment_1_2.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="transfer_shipment.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
