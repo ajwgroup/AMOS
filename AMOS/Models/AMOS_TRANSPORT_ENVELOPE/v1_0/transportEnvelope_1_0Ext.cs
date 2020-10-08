@@ -19,5 +19,19 @@ namespace AMOS.Models.AMOS_TRANSPORT_ENVELOPE.v1_0
             using (StringReader stringreader = new StringReader(doc.OuterXml))
                 return (T)serializer.Deserialize(stringreader);
         }
+
+        public static Double? GetVersion(this transportEnvelope_1_0 envelope, string payloadTypeLowerCase)
+        {
+            if (envelope.payload == null)
+                return null;
+
+            if (envelope.payload.type == null)
+                return null;
+
+            if (envelope.payload.type.ToLower().Equals(payloadTypeLowerCase.ToLower()))
+                return Convert.ToDouble(envelope.payload.version);
+
+            return null;
+        }
     }
 }
