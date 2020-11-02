@@ -12,6 +12,10 @@
     <PackageLicenseUrl>https://github.com/ajwgroup/AMOS/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="Models\12-10-067\**" />
     <Compile Remove="Models\12-20-054\**" />

@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using AMOS.Models.IMPORT_ORDER_CONFIRMATION.v0_1;
+using AMOS.Models.TRANSFER_RECEIVING.v1_1;
 
 namespace AMOSTests
 {
@@ -87,6 +88,13 @@ namespace AMOSTests
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_PART_DEFINITION_6773E010000.xml")));
             Assert.AreEqual("6773E010000", transportEnvelope.GetPayload<transferPartDefinition_1_1>().part.First().partNumber);
+        }
+
+        [TestMethod]
+        public void TransferReceiving_PassesFile_ReturnsExpectedValue()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_RECEIVING_1_1.xml")));
+            Assert.AreEqual("123123", transportEnvelope.GetPayload<transferReceiving_1_1>().receiving.First().id.Item);
         }
 
         [TestMethod]
