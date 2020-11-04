@@ -94,7 +94,24 @@ namespace AMOSTests
         public void TransferReceiving_PassesFile_ReturnsExpectedValue()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_RECEIVING_1_1.xml")));
-            Assert.AreEqual("123123", transportEnvelope.GetPayload<transferReceiving_1_1>().receiving.First().id.Item);
+            var receiving = transportEnvelope.GetPayload<transferReceiving_1_1>().receiving.First();
+            var item = transportEnvelope.GetPayload<transferReceiving_1_1>().receiving.First().items.First();
+
+            Assert.AreEqual("12345", receiving.receivingHeader.awbNumber);
+            Assert.AreEqual(new DateTime(2020,10,14).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), DateTime.ParseExact(receiving.receivingHeader.bookingDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+            Assert.AreEqual("12345", item.partType.ItemRotable.certificateNumber);
+            Assert.AreEqual("R16990520", item.origin.ItemOrder.orderNumber.Value);
+            Assert.AreEqual("1", item.origin.ItemOrder.orderPosition);
+            Assert.AreEqual(null, item.origin.ItemPickSlip?.pickslipNumber);
+            Assert.AreEqual(new DateTime(2020, 10, 14).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), DateTime.ParseExact(receiving.receivingHeader.deliveryDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+            Assert.AreEqual("A-11-111", item.location.location);
+            Assert.AreEqual("DUB", item.location.station);
+            Assert.AreEqual("AJW", item.location.store);
+            Assert.AreEqual("2758", item.partNumber.Value);
+            Assert.AreEqual("999999", item.recDetailNoI);
+            Assert.AreEqual("123123", receiving.id.Item);
+            Assert.AreEqual("123456", item.partType.ItemRotable.serialNumber);
+            Assert.AreEqual(null, item.partType.ItemNonRotable?.quantity);
         }
 
         [TestMethod]

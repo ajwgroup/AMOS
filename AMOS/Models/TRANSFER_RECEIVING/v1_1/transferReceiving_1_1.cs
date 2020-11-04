@@ -8,6 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Xml.Serialization;
 
 // 
@@ -664,12 +665,39 @@ namespace AMOS.Models.TRANSFER_RECEIVING.v1_1
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("nonrotable", typeof(itemTypePartTypeNonrotable), Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        [System.Xml.Serialization.XmlElementAttribute("rotable", typeof(itemTypePartTypeRotable), Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public object Item
+        public itemTypePartTypeNonrotable ItemNonRotable
         {
             get
             {
-                return this.itemField;
+                try
+                {
+                    return (itemTypePartTypeNonrotable)this.itemField;
+                }
+                catch (InvalidCastException)
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                this.itemField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("rotable", typeof(itemTypePartTypeRotable), Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public itemTypePartTypeRotable ItemRotable
+        {
+            get
+            {
+                try
+                {
+                    return (itemTypePartTypeRotable)this.itemField;
+                }
+                catch (InvalidCastException)
+                {
+                    return null;
+                }
             }
             set
             {
@@ -887,12 +915,39 @@ namespace AMOS.Models.TRANSFER_RECEIVING.v1_1
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("order", typeof(itemTypeOriginOrder), Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        [System.Xml.Serialization.XmlElementAttribute("pickslip", typeof(itemTypeOriginPickslip), Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public object Item
+        public itemTypeOriginOrder ItemOrder
         {
             get
             {
-                return this.itemField;
+                try
+                {
+                    return (itemTypeOriginOrder)this.itemField;
+                }
+                catch (InvalidCastException e)
+                {
+                    return null;
+                }
+            }
+            set
+            {
+                this.itemField = value;
+            }
+
+        }
+
+        [System.Xml.Serialization.XmlElementAttribute("pickslip", typeof(itemTypeOriginPickslip), Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public itemTypeOriginPickslip ItemPickSlip
+        {
+            get
+            {
+                try
+                {
+                    return (itemTypeOriginPickslip)this.itemField;
+                }
+                catch (InvalidCastException e)
+                {
+                    return null;
+                }
             }
             set
             {
