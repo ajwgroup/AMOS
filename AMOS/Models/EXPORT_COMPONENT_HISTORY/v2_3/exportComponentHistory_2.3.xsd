@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2016 sp1 (x64) (http://www.altova.com) by Swiss AviationSoftware Ltd. (Swiss AviationSoftware Ltd.) -->
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2015 (VECH) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 0.1 - SINCE AMOS 9.40
+05/08/2008 - removed include of AmosCommonTypes. Copied used types.
+12/08/2009 - Changed maxLength of <certificateNumber> to 40, added some facets, set some types.
+20/09/2009 - Changed maxLength from 8 to 12 on <location> field.
+
+Version 0.11 - SINCE AMOS 9.40
+03/12/2010 - Corrected <quantity> to double
+16/11/2011 - Updated documentation and references.
+
+Version 0.12 - AMOS 9.70
+03/02/2012 - Changed maxLength to 14 on <location> field.
+03/02/2012 - Changed maxLength to 10 on <store> field.
+
+Version 0.13 - AMOS 10.30
+04/10/2013 - enlarged field <destinationLocation>
+20/03/2014 - completed mime-type annotations
+
+Version 1.0 - AMOS 10.70
+02/02/2015 - added fields <entityCode> and <materialType>
+           - <originStation>, <originStore> and <originLocation> and <orderPosition> fields are now populated when possible
+           
+Version 1.1 - AMOS 10.80
+29/04/2015 - added fields <repairable> and <tool>.
+04/06/2015 - mark field <position> as not filled
+
+Version 2.0 - AMOS 11.00
+20/01/2015 - added field <transactionID>
+
+Version 2.1 - AMOS 11.10
+19/05/2016 - Changed maxLength of <externalInvoiceNumber> from 14 to 25.
+
+Version 2.2 - AMOS 11.30
+05/12/2016 - added field <text> under booking-level.
+25/01/2017 - Enhanced database mappings
+10/02/2017 - Enhanced database mappings
+
+Version 2.3 - AMOS 11.40
+03/05/2017 - Part numbers up to 32 characters are supported for the <partNumber> field."                                
+
+***AMOS_CHANGELOG_END***-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="0.1">
+	<xs:element name="exportComponentHistory">
+		<xs:annotation>
+			<xs:documentation>Root element</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="booking" type="bookingType" minOccurs="0" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>This element reflects a single booking entry. The schema carries a dump of the content of database table 'history'. No interpretation of the content of the fields is made.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" use="required" fixed="2.3"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- YES OR NO -->
+	<xs:simpleType name="yesNoType">
+		<xs:annotation>
+			<xs:documentation>Y=YES; N=NO.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y">
+				<xs:annotation>
+					<xs:documentation>YES.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="N">
+				<xs:annotation>
+					<xs:documentation>NO.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PROJECT NUMBER -->
+	<xs:simpleType name="projectNumberType">
+		<xs:annotation>
+			<xs:documentation>Must have a max of 14 characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="14"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ORDER NUMBER-->
+	<xs:simpleType name="orderNumberType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="12"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- ATA CHAPTER -->
+	<xs:simpleType name="ataChapter">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="12"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- STATION -->
+	<xs:simpleType name="station">
+		<xs:annotation>
+			<xs:documentation>Max. 4 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- STORE -->
+	<xs:simpleType name="store">
+		<xs:annotation>
+			<xs:documentation>Max. 10 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="10"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- LOCATION -->
+	<xs:simpleType name="location">
+		<xs:annotation>
+			<xs:documentation>Max. 16 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="16"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- AC_TYPE -->
+	<xs:simpleType name="acSimpleType">
+		<xs:annotation>
+			<xs:documentation>Use for ac register number or ac type. Max. 6 characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="6"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRICE TYPE DEFINITION -->
+	<xs:complexType name="priceType">
+		<xs:annotation>
+			<xs:documentation>Pricing information.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="double">
+				<xs:attribute name="internationalCurrencyCode" use="required">
+					<xs:annotation>
+						<xs:appinfo>AMOS_DATABASE_EXPORT=entity_header.currency</xs:appinfo>
+						<xs:appinfo>AMOS_MIMETYPE=D_CURRENCY</xs:appinfo>
+						<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=4</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="3"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- SIMPLE ISO8601 DATE -->
+	<xs:simpleType name="simpleDateType">
+		<xs:annotation>
+			<xs:documentation>Date type. ISO8601-date as string or empty string.</xs:documentation>
+			<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([12][0-9][0-9][0-9]\-((0[1-9])|(1[0-2]))\-((0[1-9])|([12][0-9])|([3][01])))?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- SIMPLE UTC TIME -->
+	<!--PARTNUMBER DEFINITION -->
+	<xs:simpleType name="partNumberType">
+        <xs:annotation>
+            <xs:documentation>Type for partnumbers</xs:documentation>
+            <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=32</xs:appinfo>
+        </xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--PARTSERIALNUMBER DEFINITION -->
+	<xs:simpleType name="partSerialNumberType">
+		<xs:annotation>
+			<xs:documentation>Type for part-serialnumbers: minLength=1; maxLength=20</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRIMITIVE TYPES -->
+	<xs:simpleType name="positiveInteger">
+		<xs:annotation>
+			<xs:documentation>Zero or positive integer</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="2147483647"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="integer">
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="-2147483648"/>
+			<xs:maxInclusive value="2147483647"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="double">
+		<xs:annotation>
+			<xs:documentation>Limited to 17 digits overall</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="17"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="bookingType">
+		<xs:sequence>
+			<xs:element name="bookingID" type="positiveInteger">
+				<xs:annotation>
+					<xs:documentation>AMOS unique number (historyno_i)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.historyno_i</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_HISTORYNO</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="voucherMode">
+				<xs:annotation>
+					<xs:documentation>Voucher Mode used for this particular booking.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.vm</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=VOUCHER_MODE</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="partNumber" type="partNumberType">
+				<xs:annotation>
+					<xs:documentation>Partnumber the booking was made for.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.partno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="serialNumber" type="partSerialNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A rotable's serial number. Not filled for consumables.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.serialno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="batchNumber" type="partSerialNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A consumable's batch number. Not filled for rotables.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.batchno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="batchExpiryDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A consumable's expiry date.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.expire_date</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="date" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date the transaction took place..</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.del_date</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="quantity" type="double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Quantity.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.qty</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="unitOfMeasurement" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The part number's unit of measurement.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=part.measure_unit</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_MEASURE_UNIT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="materialClass" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>R=rotable, C=consumable, E=expendable ...</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.mat_class</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=MAT_CLASS</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="materialType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Part Material Type</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.mat_type</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="voucherNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The transaction's voucher number.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.voucherno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="averagePrice" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The transaction's average price.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.average_price</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="purchasePrice" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The transaction's purchase price.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.purch_price</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="aircraft" type="acSimpleType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Aircraft registration without prefix. E.G. JAQ</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.ac_registr</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="aircraftType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Aircraft type as recorded in history.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.ac_typ</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC_TYPE</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="position" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Installation position of the aircraft. This field is not field, as there is no corresponding column in history table.</xs:documentation>
+					<xs:appinfo>AMOS_NOT_FILLED</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="14"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="totalAircraftHours" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Total Aircraft Hours (TAH).</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.tah</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="totalAircraftCycles" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Total Aircraft Cycles (TAC).</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.tac</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="timeSinceNew" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Time Since New in hours. (TSN)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.tsn</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cyclesSinceNew" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cycles Since New. (CSN)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.csn</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="timeBetweenInstallation" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Time Between Installations in hours. (TBI)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.tbi</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="cyclesBetweenInstallation" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cycles Between Installations. (CBI)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.cbi</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="manufacturingDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Manufacturing date of the (rotable) part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=rotables.mfg_date</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ataChapter" type="ataChapter" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The Part's ATA Chapter.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.ata_chapter</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=G_ATA_CHAPTER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="workorderNumber" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Workorder number the part was removed with.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.event_perfno_i</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=E_WO</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="labelNumber" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Label the (rotable) part was removed with.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.labelno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_LABEL</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="condition" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Condition the (rotable) part was removed in.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.condition</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=G_CONDITION</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="receiver" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Receiver, can be an aircraft or an address..</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.receiver</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_ADDRESS</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="orderNumber" type="orderNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Order number the part was removed for.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.orderno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="orderPosition" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Order position the part was removed for.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.posno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="orderDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date of the order the part was removed for.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.orderdate</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="invoiceNumber" type="integer" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Invoice issued for this transaction.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_invoice.int_invoiceno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=F_INVOICE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="externalInvoiceNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The supplier's original invoice number.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_invoice.invoiceno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="25"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="invoiceDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date of the invoice.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_invoice.invoice_date</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="recDetailNoI" type="integer" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Receiving number the part was received with.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.recdetailno_i</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_RECEIVING_DETAIL</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="failureConfirmed" type="yesNoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Confirmed failure? Y=yes, N=no, ...</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.confirmed</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="removalReason" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reason the part was removed for. US = unsscheduled, SD = scheduled</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.reason</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="6"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="certificateNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Certificate/Releasno used for the removal.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.releaseno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="40"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="originStation" type="station" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Origin Station.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.station</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history_text.short_text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=50</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="originStore" type="store" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Origin Store.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.store</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history_text.short_text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_STORE</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=50</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="originLocation" type="location" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Origin Location.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.location</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history_text.short_text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_LOCATION</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=50</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="destinationStation" type="station" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Destination Station.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.station</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="destinationStore" type="store" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Destination Store.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.store</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_STORE</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="destinationLocation" type="location" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Destination Location.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.location</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_LOCATION</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="higherPartNumber" type="partNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Highest part number of an assy.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.higher_partno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="higherSerialNumber" type="partSerialNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Highest serial number of an assy.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.higher_serialno</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="costCenter" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Cost center.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.costcenter</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=F_COST_CENTER</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="projectNumber" type="projectNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reference to the project..</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.projectno_i</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=F_PROJECT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="owner" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Owner of the part.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.owner</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_ADDRESS</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="creatorOfEntry" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User sign who created the history record</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.created_by</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="8"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="entityCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Unique code identifying the entity.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=entity_header.entity_code</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=F_ENTITY_CODE</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="repairable" type="yesNoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Is repairable ? Y=yes, N=no, ...</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.repairable</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="tool" type="yesNoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Is a tool ? Y=yes, N=no, ...</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.tool</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="transactionID" type="xs:int" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Stores the transactionID, an internal parameter used to group the history bookings.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.transaction_id</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="text" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Booking text.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history_text.short_text</xs:appinfo>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
