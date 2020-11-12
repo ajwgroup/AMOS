@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using AMOS.Models.IMPORT_ORDER_CONFIRMATION.v0_1;
 using AMOS.Models.TRANSFER_RECEIVING.v1_1;
+using AMOS.Models.EXPORT_COMPONENT_HISTORY.v2_3;
 
 namespace AMOSTests
 {
@@ -88,6 +89,108 @@ namespace AMOSTests
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_PART_DEFINITION_6773E010000.xml")));
             Assert.AreEqual("6773E010000", transportEnvelope.GetPayload<transferPartDefinition_1_1>().part.First().partNumber);
+        }
+
+        [TestMethod]
+        public void TransferExportComponentHistory_PassesFile_ReturnsExpectedValue()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("EXPORT_COMPONENT_HISTORY_2_3.xml")));
+            var booking = transportEnvelope.GetPayload<exportComponentHistory>().booking.FirstOrDefault();
+
+            Assert.AreEqual("AAA", booking.aircraft);
+            Assert.AreEqual("A33F", booking.aircraftType);
+            Assert.AreEqual("25-51", booking.ataChapter);
+            Assert.AreEqual(null, booking.averagePrice);
+            Assert.AreEqual(null, booking.batchExpiryDate);
+            Assert.AreEqual(null, booking.batchNumber);
+            Assert.AreEqual("1111111", booking.bookingID);
+            Assert.AreEqual(null, booking.certificateNumber);
+            Assert.AreEqual("S", booking.condition);
+            Assert.AreEqual(null, booking.costCenter);
+            Assert.AreEqual(null, booking.creatorOfEntry);
+            Assert.AreEqual("7937", booking.cyclesBetweenInstallation);
+            Assert.AreEqual("7937", booking.cyclesSinceNew);
+            Assert.AreEqual(new DateTime(2020, 01, 17).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), DateTime.ParseExact(booking.date, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+            Assert.AreEqual(null, booking.destinationLocation);
+            Assert.AreEqual(null, booking.destinationStation);
+            Assert.AreEqual(null, booking.destinationStore);
+            Assert.AreEqual(null, booking.entityCode);
+            Assert.AreEqual(null, booking.externalInvoiceNumber);
+            Assert.AreEqual("Y", booking.failureConfirmed.ToString());
+            Assert.AreEqual("True", booking.failureConfirmedSpecified.ToString());
+            Assert.AreEqual(null, booking.higherPartNumber);
+            Assert.AreEqual(null, booking.higherSerialNumber);
+            Assert.AreEqual(null, booking.invoiceDate);
+            Assert.AreEqual(null, booking.invoiceNumber);
+            Assert.AreEqual("5305983", booking.labelNumber);
+            Assert.AreEqual(null, booking.manufacturingDate);
+            Assert.AreEqual("R", booking.materialClass);
+            Assert.AreEqual(null, booking.materialType);
+            Assert.AreEqual(new DateTime(2020, 01, 17).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), DateTime.ParseExact(booking.orderDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+            Assert.AreEqual("R00000000", booking.orderNumber);
+            Assert.AreEqual(null, booking.orderPosition);
+            Assert.AreEqual(null, booking.originLocation);
+            Assert.AreEqual(null, booking.originStation);
+            Assert.AreEqual(null, booking.originStore);
+            Assert.AreEqual(null, booking.owner);
+            Assert.AreEqual("YG101-04", booking.partNumber);
+            Assert.AreEqual(null, booking.higherPartNumber);
+            Assert.AreEqual(null, booking.higherSerialNumber);
+            Assert.AreEqual(null, booking.invoiceDate);
+            Assert.AreEqual(null, booking.invoiceNumber);
+            Assert.AreEqual("5305983", booking.labelNumber);
+            Assert.AreEqual(null, booking.manufacturingDate);
+            Assert.AreEqual("R", booking.materialClass);
+            Assert.AreEqual(null, booking.materialType);
+            Assert.AreEqual("2020-01-17", booking.orderDate);
+            Assert.AreEqual("R00000000", booking.orderNumber);
+            Assert.AreEqual(null, booking.orderPosition);
+            Assert.AreEqual(null, booking.originLocation);
+            Assert.AreEqual(null, booking.originStation);
+            Assert.AreEqual(null, booking.originStore);
+            Assert.AreEqual(null, booking.owner);
+            Assert.AreEqual("YG101-04", booking.partNumber);
+            Assert.AreEqual(null, booking.position);
+            Assert.AreEqual(null, booking.projectNumber);
+            Assert.AreEqual(null, booking.purchasePrice);
+            Assert.AreEqual(Convert.ToDecimal(1.0), booking.quantity);
+            Assert.AreEqual(true, booking.quantitySpecified);
+            Assert.AreEqual(null, booking.recDetailNoI);
+            Assert.AreEqual(null, booking.receiver);
+            Assert.AreEqual("SD", booking.removalReason);
+            Assert.AreEqual("Y", booking.repairable.ToString());
+            Assert.AreEqual(false, booking.repairableSpecified);
+            Assert.AreEqual("123456", booking.serialNumber);
+            Assert.AreEqual(null, booking.text);
+            Assert.AreEqual("47169", booking.timeBetweenInstallation);
+            Assert.AreEqual("47169", booking.timeSinceNew);
+            Assert.AreEqual("Y", booking.tool.ToString());
+            Assert.AreEqual(false, booking.toolSpecified);
+            Assert.AreEqual("7942", booking.totalAircraftCycles);
+            Assert.AreEqual("47178", booking.totalAircraftHours);
+            Assert.AreEqual(0, booking.transactionID);
+            Assert.AreEqual(false, booking.transactionIDSpecified);
+            Assert.AreEqual("EA", booking.unitOfMeasurement);
+            Assert.AreEqual("YA", booking.voucherMode);
+            Assert.AreEqual(null, booking.voucherNumber);
+            Assert.AreEqual("1234567", booking.workorderNumber);
+
+            /*
+            Assert.AreEqual(new DateTime(2020, 10, 14).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), DateTime.ParseExact(receiving.receivingHeader.bookingDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+            Assert.AreEqual("12345", item.partType.ItemRotable.certificateNumber);
+            Assert.AreEqual("R16990520", item.origin.ItemOrder.orderNumber.Value);
+            Assert.AreEqual("1", item.origin.ItemOrder.orderPosition);
+            Assert.AreEqual(null, item.origin.ItemPickSlip?.pickslipNumber);
+            Assert.AreEqual(new DateTime(2020, 10, 14).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture), DateTime.ParseExact(receiving.receivingHeader.deliveryDate, "yyyy-MM-dd", CultureInfo.InvariantCulture).ToString("yyyyMMddHHmmss", CultureInfo.InvariantCulture));
+            Assert.AreEqual("A-11-111", item.location.location);
+            Assert.AreEqual("DUB", item.location.station);
+            Assert.AreEqual("AJW", item.location.store);
+            Assert.AreEqual("2758", item.partNumber.Value);
+            Assert.AreEqual("999999", item.recDetailNoI);
+            Assert.AreEqual("123123", receiving.id.Item);
+            Assert.AreEqual("123456", item.partType.ItemRotable.serialNumber);
+            Assert.AreEqual(null, item.partType.ItemNonRotable?.quantity);
+            */
         }
 
         [TestMethod]

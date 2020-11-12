@@ -17,6 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="EXPORT_COMPONENT_HISTORY_2_3.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="import_order_confirmation.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -22,7 +22,7 @@ namespace AMOS.Models.EXPORT_COMPONENT_HISTORY.v2_3
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    [System.Xml.Serialization.XmlRootAttribute(ElementName = "exportComponentHistory", Namespace = "", , IsNullable = false)]
+    [System.Xml.Serialization.XmlRootAttribute(ElementName = "exportComponentHistory", Namespace = "", IsNullable = false)]
     public partial class exportComponentHistory
     {
 
