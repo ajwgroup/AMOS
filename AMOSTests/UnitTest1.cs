@@ -14,6 +14,8 @@ using System.Text;
 using AMOS.Models.IMPORT_ORDER_CONFIRMATION.v0_1;
 using AMOS.Models.TRANSFER_RECEIVING.v1_1;
 using AMOS.Models.EXPORT_COMPONENT_HISTORY.v2_3;
+using AMOS.Models.TRANSFER_SHIPMENT.v1_2;
+using AMOS.Models.TRANSFER_SHIPMENT.v0_1;
 
 namespace AMOSTests
 {
@@ -241,7 +243,28 @@ namespace AMOSTests
         public void FromXml_ReturnsTransferShipment()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment.xml")));
-            Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.GetPayload<transferShipment_1_1>().shipment.First().awbNumber);
+            Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.GetPayload<transferShipment_0_1>().shipment.First().awbNumber);
+        }
+
+        [TestMethod]
+        public void FromXml_ReturnsTransferShipment1_2()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_SHIPMENT_1_2.xml")));
+            Assert.AreEqual(AMOS.Models.TRANSFER_SHIPMENT.v1_2.shipmentHeaderTypeShipmentType.EO, transportEnvelope.GetPayload<transferShipment_1_2>().shipment.First().shipmentHeader.shipmentType);
+        }
+
+        [TestMethod]
+        public void FromXml_ReturnsTransferShipment1_2_ReturnsVersion0_1()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment_0_1.xml")));
+            Assert.AreEqual("0.1", transportEnvelope.GetPayload<transferShipment_0_1>().version);
+        }
+
+        [TestMethod]
+        public void FromXml_ReturnsTransferShipment1_2_ReturnsVersion1_2()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_SHIPMENT_1_2.xml")));
+            Assert.AreEqual("1.2", transportEnvelope.GetPayload<transferShipment_1_2>().version);
         }
 
         /*[TestMethod]

@@ -1,0 +1,748 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Mit XMLSpy v2007 bearbeitet (http://www.altova.com) von Swiss AviationSoftware (Swiss AviationSoftware) -->
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2005 (VECH/KUNT) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 0.1
+31/07/2007 	 - created
+04/09/2007 	 - changed cardinality of details/packages per item
+05/08/2008 	 - removed AmosCommonTypes include. Copied needed types.
+30/06/2009	 - added price-field on detail level, made packedBy-field optional
+
+WARNING: This schema version only supports up to 20 characters for part number fields!
+Extended part numbers, up to 32 characters, are handled from version 1.1 onwards.
+***AMOS_CHANGELOG_END***-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="0.1">
+	<!-- COMMON TYPES -->
+	<!-- SIMPLE ISO8601 DATE -->
+	<xs:simpleType name="simpleDateType">
+		<xs:annotation>
+			<xs:documentation>Date type. ISO8601-date as string or empty string.</xs:documentation>
+			<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([12][0-9][0-9][0-9]\-((0[1-9])|(1[0-2]))\-((0[1-9])|([12][0-9])|([3][01])))?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- SIMPLE UTC TIME -->
+	<xs:simpleType name="simpleTimeUtcType">
+		<xs:annotation>
+			<xs:documentation>Time type. UTC-time as string or empty string.</xs:documentation>
+			<xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(([01][0-9][:][0-5][0-9])|(2[0-3][:][0-5][0-9]))?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- YES OR NO -->
+	<xs:simpleType name="yesNoType">
+		<xs:annotation>
+			<xs:documentation>Y=YES; N=NO.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y">
+				<xs:annotation>
+					<xs:documentation>YES.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="N">
+				<xs:annotation>
+					<xs:documentation>NO.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRIMITIVE TYPES -->
+	<xs:simpleType name="positiveInteger">
+		<xs:annotation>
+			<xs:documentation>Zero or positive integer</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="2147483647"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="double">
+		<xs:annotation>
+			<xs:documentation>Limited to 17 digits overall</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="17"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="positiveDouble">
+		<xs:annotation>
+			<xs:documentation>Zero or positive decimal number</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="17"/>
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PARTNUMBER DEFINITION -->
+	<xs:simpleType name="partNumberType">
+		<xs:annotation>
+			<xs:documentation>Type for partnumbers: minLentgh=1; maxLength=20;</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--PARTSERIALNUMBER DEFINITION -->
+	<xs:simpleType name="partSerialNumberType">
+		<xs:annotation>
+			<xs:documentation>Type for part-serialnumbers: minLength=1; maxLength=20</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- amosAddressType -->
+	<xs:complexType name="amosAddressType">
+		<xs:all>
+			<xs:element name="code">
+				<xs:annotation>
+					<xs:documentation>Code representing the address in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="name" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Name in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="contactName" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Name in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="address" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Address in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="city" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>City of address in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="zipCode" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>ZIP-code of address in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="10"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="country" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Country of address in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="communicationData" type="comDataList" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Address communication data.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- comDataList -->
+	<xs:complexType name="comDataList">
+		<xs:sequence>
+			<xs:element name="communicationData" type="comDataType" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- comDataType -->
+	<xs:complexType name="comDataType">
+		<xs:sequence>
+			<xs:element name="type">
+				<xs:annotation>
+					<xs:documentation>Type of communication data.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="2"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="value">
+				<xs:annotation>
+					<xs:documentation>Value of communication data.</xs:documentation>
+					<xs:documentation>Max. Length: 36 characters.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="description" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Description of communication data.</xs:documentation>
+					<xs:documentation>Max. Length: 36 characters.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- COMMON TYPES finished -->
+	<!-- transferShipment -->
+	<xs:element name="transferShipment">
+		<xs:annotation>
+			<xs:documentation>Root element for SHIPMENT form.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="shipment" type="shipmentType">
+					<xs:annotation>
+						<xs:documentation>Shipment to be uploaded/changed/deleted.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" use="required" fixed="0.1"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- shipmentType -->
+	<xs:complexType name="shipmentType">
+		<xs:sequence>
+			<xs:element name="awbNumber">
+				<xs:annotation>
+					<xs:documentation>The documents awb-number. (Airway bill)</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=sh_header.awbno</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="orgAwbNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Original awb-number after a change.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="20"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="shipmentHeader" type="shipmentHeaderType">
+				<xs:annotation>
+					<xs:documentation>The shipment header.</xs:documentation>
+					<xs:appinfo/>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shipmentItems" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Shipment details (items).</xs:documentation>
+					<xs:appinfo/>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:choice>
+							<xs:element name="package" type="shipmentPackageType"/>
+							<xs:element name="detail" type="shipmentDetailType"/>
+						</xs:choice>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- shipmentHeaderType-->
+	<xs:complexType name="shipmentHeaderType">
+		<xs:all>
+			<xs:element name="shipmentType">
+				<xs:annotation>
+					<xs:documentation>	EXTERNAL_INCOMING_SHIPMENT = EI;
+													EXTERNAL_OUTGOING_SHIPMENT = EO;
+					</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.type</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="EI"/>
+						<xs:enumeration value="EO"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="awbDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date when the AWB was given.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.awbdate</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="internalShipment" type="yesNoType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Is the shipment an internal shipment - Y or N.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.is_internal</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="externalShipmentNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If shipment was created from an other shipment, the other shipmentno will be saved here.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.ext_shipmentno</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="estimatedArrivalDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If the origin is an internal shop, this holds the station to this shop.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.arrival_date</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="accountNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Accountno for the shipper. Defined in Address Management.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.accountno</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="originStation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If the origin is an internal shop, this holds the station to this shop.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.origin_station</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="destinationStation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>If the destination is an internal shop, this holds the station to this shop.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.destination_station</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="aaNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Holds information about the AA-No. (Ausfuhranmeldung)</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.aa_no</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="16"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="shipmentStatus">
+				<xs:annotation>
+					<xs:documentation>
+													SENT = S
+													ARRIVED = A
+													RECEIVED = R
+													PARTLY_RECEIVED = X
+													PARTLY_ARRIVED = P
+												    TRANSFER = T
+													OPEN = O
+													CLOSED = C
+					</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.state</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="S"/>
+						<xs:enumeration value="A"/>
+						<xs:enumeration value="T"/>
+						<xs:enumeration value="X"/>
+						<xs:enumeration value="P"/>
+						<xs:enumeration value="O"/>
+						<xs:enumeration value="C"/>
+						<xs:enumeration value="R"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="transportMethod" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>How will the shipment be transported.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="code">
+							<xs:annotation>
+								<xs:documentation>Method of transport code.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_header.method_of_transport</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="20"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="description" type="xs:string"/>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="flightInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="legNumber" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If kown and shipment is coming via plane, the flightno can be entered here.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_header.leg_number</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="8"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="flightDate" type="simpleDateType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If kown and shipment is coming via plane, the date can be entered here.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_header.flight_date</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="flightArrival" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If kown and shipment is coming via plane, the arrival airport can be entered.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_header.flight_arrival</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="flightDeparture" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>If kown and shipment is coming via plane, the departure airport can be entered.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_header.flight_departure</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="weightInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="totalWeight" type="positiveDouble" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Total weight of the shipment.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_header.total_weight</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="totalVolWeight" type="positiveDouble" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation/>
+								<xs:appinfo>AMOS_DATABASE=sh_header.total_vol_weight</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="totalNetWeight" type="positiveDouble" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation/>
+								<xs:appinfo>AMOS_DATABASE=sh_header.total_net_weight</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="shipmentText" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Text which will be printed on the shipment papers.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.shipment_text</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Internal remarks for the shipment.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.remarks</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shipperAddress" type="amosAddressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Who will deliver the shipment.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.shipper</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="billingAddress" type="amosAddressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Who is going to pay for it.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.bill_to</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="destinationAddress" type="amosAddressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Destination of the shipment.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.destination</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="originAddress" type="amosAddressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Origin of the shipment.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.origin_address_i</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="issuerAddress" type="amosAddressType">
+				<xs:annotation>
+					<xs:documentation>Who issued this shipment.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_header.issued_by</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="deliveryInformation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Shipment delivery information.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="deliveryDate" type="simpleDateType">
+							<xs:annotation>
+								<xs:documentation>Date the shipment has been delivered on.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="deliveryTime" type="simpleTimeUtcType">
+							<xs:annotation>
+								<xs:documentation>Time the shipment has been delivered on</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- shipmentDetailType -->
+	<xs:complexType name="shipmentDetailType">
+		<xs:all>
+			<xs:element name="detailNumber" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Generic Name/Number for a detail.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="partNumber" type="partNumberType">
+				<xs:annotation>
+					<xs:documentation>Partno of the shipped item.</xs:documentation>
+					<xs:documentation>This field only supports up to 20 characters. Please use the latest schema version to accommodate part numbers up to 32 characters.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_detail.partno</xs:appinfo>
+					<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=32</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="serialNumber" type="partSerialNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Serialno of the shipped item.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_detail.serial</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="quantity" type="positiveDouble">
+				<xs:annotation>
+					<xs:documentation>Qty of the shipped item.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_detail.qty</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="labelNumber" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Labelno of the shipped item.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_detail.labelno</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="pickslipNumber" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Pickslip of the shipped item.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="remarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Right now only used for internally. Holds remarks for a shipment detail.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_detail.remarks</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="currentLocationAddress" type="amosAddressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Current location of the item.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_detail.locationno_i</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="orderInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="amosOrderNumber" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>An AMOS-ordernumber.</xs:documentation>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="12"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="orderPosition" type="positiveInteger" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>The items position on an order.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="externalOrderNumber" type="xs:string" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>An external ordernumber.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="price" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>A part number's customs value. Given in customer's local currency.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_detail.price</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- shipmentPackageType -->
+	<xs:complexType name="shipmentPackageType">
+		<xs:all>
+			<xs:element name="packingNumber">
+				<xs:annotation>
+					<xs:documentation>Packageno, given by the shipper.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_package.packingno</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="packedBy" type="amosAddressType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Who packed it.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_package.packed_by</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="packedDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>When was it packed.</xs:documentation>
+					<xs:appinfo>AMOS_DATABASE=sh_package.packed_date</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="sizeInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="width" type="positiveInteger" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Width of the package.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_package.width</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="length" type="positiveInteger" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Length of the package.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_package.length</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="height" type="positiveInteger" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Height of the package.</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_package.height</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="weightInformation" minOccurs="0">
+				<xs:complexType>
+					<xs:all>
+						<xs:element name="totalWeight" type="positiveDouble" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Weight of the package (gross weight).</xs:documentation>
+								<xs:appinfo>AMOS_DATABASE=sh_package.weight</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="totalVolWeight" type="positiveDouble" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation/>
+								<xs:appinfo>AMOS_DATABASE=sh_package.vol_weight</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="totalNetWeight" type="positiveDouble" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation/>
+								<xs:appinfo>AMOS_DATABASE=sh_package.net_weight</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:all>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="packageDetails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>List of details on the package.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="detail" type="shipmentDetailType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- PRICE TYPE DEFINITION -->
+	<xs:complexType name="priceType">
+		<xs:annotation>
+			<xs:documentation>Pricing information.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="double">
+				<xs:attribute name="internationalCurrencyCode" use="required">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="3"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:schema>
