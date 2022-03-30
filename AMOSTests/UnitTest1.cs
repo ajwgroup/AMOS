@@ -254,6 +254,13 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void FromXml_ReturnsTransferShipment1_3()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_SHIPMENT_1_3.xml")));
+            Assert.AreEqual(AMOS.Models.TRANSFER_SHIPMENT.v1_3.shipmentHeaderTypeShipmentType.EO, transportEnvelope.GetPayload<AMOS.Models.TRANSFER_SHIPMENT.v1_3.transferShipment_1_3>().shipment.First().shipmentHeader.shipmentType);
+        }
+
+        [TestMethod]
         public void FromXml_ReturnsTransferShipment1_2_ReturnsVersion0_1()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment_0_1.xml")));
@@ -265,6 +272,13 @@ namespace AMOSTests
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_SHIPMENT_1_2.xml")));
             Assert.AreEqual("1.2", transportEnvelope.GetPayload<transferShipment_1_2>().version);
+        }
+
+        [TestMethod]
+        public void FromXml_ReturnsTransferShipment1_3_ReturnsVersion1_3()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_SHIPMENT_1_3.xml")));
+            Assert.AreEqual("1.3", transportEnvelope.GetPayload<AMOS.Models.TRANSFER_SHIPMENT.v1_3.transferShipment_1_3>().version);
         }
 
         /*[TestMethod]
