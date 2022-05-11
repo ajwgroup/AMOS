@@ -16,6 +16,8 @@ using AMOS.Models.TRANSFER_RECEIVING.v1_1;
 using AMOS.Models.EXPORT_COMPONENT_HISTORY.v2_3;
 using AMOS.Models.TRANSFER_SHIPMENT.v1_2;
 using AMOS.Models.TRANSFER_SHIPMENT.v0_1;
+using System.Xml.Serialization;
+using System.Xml;
 
 namespace AMOSTests
 {
@@ -245,6 +247,28 @@ namespace AMOSTests
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment.xml")));
             Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.GetPayload<transferShipment_0_1>().shipment.First().awbNumber);
         }
+
+        [TestMethod]
+        public void ToXml_OutputsTransferShipmentWithNoDetailLine()
+        {
+            var transferShipment = new transferShipment_0_1();
+            XmlSerializer serializer = new XmlSerializer(typeof(transferShipment_0_1));
+            var transferShipmentXml = "shipmentDetail";
+
+
+            using (var sww = new StringWriter())
+            {
+                using (XmlWriter writer = XmlWriter.Create(sww))
+                {
+                    serializer.Serialize(writer, transferShipment);
+                    transferShipmentXml = sww.ToString(); 
+                    
+                }
+            }
+
+            Assert.AreEqual(transferShipmentXml.Contains("shipmentDetail"), false);
+        }
+
 
         [TestMethod]
         public void FromXml_ReturnsTransferShipment1_2()
