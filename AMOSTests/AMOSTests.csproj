@@ -35,6 +35,9 @@
     <None Update="TRANSFER_ORDER_1_4.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TRANSFER_ORDER_1_4.zip">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TRANSFER_PART_D31865-111.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

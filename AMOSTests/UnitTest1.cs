@@ -240,6 +240,16 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void FromZip_PassZipWithTwoFiles_ReturnsTransferOrder14()
+        {
+            using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_1_4.zip"))
+            {
+                var transportEnvelope = EnvelopeUtils.FromZip<transportEnvelope_0_1>(fileStream);
+                Assert.AreEqual("2022-09-02", transportEnvelope.FirstOrDefault(e => e.Key.Equals("TRANSFER_ORDER.xml")).Value.GetPayload<AMOS.Models.TRANSFER_ORDER.v1_4.transferOrder_1_4>().order.First().orderDetail.First().targetDate);
+            }
+        }
+
+        [TestMethod]
         public void FromZip_PassZipWithTwoFiles_ReturnsTransferPart()
         {
             using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_0_14.zip"))
@@ -339,6 +349,13 @@ namespace AMOSTests
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER_1_2.xml")));
             Assert.AreEqual(1.2, transportEnvelope.GetVersion("transferOrder"));
+        }
+
+        [TestMethod]
+        public void GetVersion_TransferOrder_ShouldReturn1_4()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER_1_4.xml")));
+            Assert.AreEqual(1.4, transportEnvelope.GetVersion("transferOrder"));
         }
 
         [TestMethod]
