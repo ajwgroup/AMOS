@@ -1,0 +1,2580 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2017 (VECH/KUNT) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 0.1
+12/07/2007 - created
+17/03/2008 - changed <backorderQuantity> to also accept negative values
+05/08/2008 - removed AmosCommonTypes include. Copied needed types.
+21/04/2010 - Added BF (Buyer Furnished Equipment) order type
+29/04/2010 - details are optional
+27/08/2010 - status is not limited to 0,1,2 but is a number.
+
+Version 0.11
+12/05/2010 - added element <orderDetailExtension> of type: any
+08/09/2010 - VECH: removed `R` from order- and detailState enumeration.
+
+Version 0.12
+08.11.2010 - created for AZA by adding the following fields to version 0.11
+						<ataChapter>38-10</ataChapter>            
+						<materialClass>R</materialClass>            
+						<repairable>Y</repairable>            
+						<fixedAsset>N</fixedAsset>            
+						<defaultRepair>ALLISON</defaultRepair>
+			            <description>REGULATOR PRESSURE WATER INST.</description>            
+						<stationFrom>BSL</stationFrom>            
+						<awbNumber>165731215</awbNumber>            
+						<awbDate>2010-09-10</awbDate>            
+						<stockAccount>080000</stockAccount>
+					All new elements are added to the layout`s detail level.
+
+Version 0.13
+25/01/2011 - XPIS: Created version 0.13 from 0.12. Added <accountNumbers> from currencies tab to amosAddressType
+26/01/2011 - XPIS: Set type of <detailStatus> to "integer"
+01/02/2011 - XPIS: Removed enum of <orderState> and <detailState>
+29/03/2011 - XCOI: Removed enum of <amosOrderType>
+
+Version 0.14
+16/11/2011 - VECH - added reference element for transferPart-export
+29/03/2011 - XCOI: Removed enum of <amosOrderType>
+
+Version 0.15
+23/05/2012 - VECH - added overview dataType and element 
+
+Version 0.16
+25/07/2012	 - YJME - created for AZA adding following elements to 0.15:
+	<loanCostCalculator>
+		<runningTotal internationalCurrencyCode="EUR">0.00</runningTotal>
+		<estimatedTotal internationalCurrencyCode="EUR">0.00</estimatedTotal>
+	</loanCostCalculator>
+
+Version 0.17
+26/08/2013 - YSRZ - created for CHC from version 0.16. Flag <warranty> added on detail level.
+10/10/2013 - XCOI - completed field mappings
+05/11/2013 - YSRZ - SimpleDateType extended to cover years up to 9999
+
+Version 0.18
+27/01/2014 - YSRZ - attribute `required` of amosReferenceTransferPart type changed to `transferPartDefinition`.
+27/03/2014 - XCOI - added AMOS mime type annotations
+
+Version 0.19
+04/06/2014 - YSRZ - added <orderHeader>/<entityCode> and <orderDetail>/<exchangeRate>
+30/06/2014 - XCOI - fixed various typos.
+01/12/2014 - VECH - added annotations.
+
+Version 0.2
+11/03/2015 - YSRZ - added <orderHeader>/<surcharges> and <orderDetail>/<surcharges>
+
+Version 1.0
+07/09/2016 - MEYT - added <requirements>
+07/09/2016 - MEYT - added <modifications>
+25/01/2017 - Enhanced database mappings
+10/02/2017 - Enhanced database mappings
+
+Version 1.1 - AMOS 11.40
+03/05/2017 - Part numbers up to 32 characters are supported for the <partNumber> field.
+
+Version 1.2 - AMOS 12.00
+12/07/2017 - Added several fields to the overview section
+24/07/2017 - Added <fromStore> and <toStore> sections under the orderHeader-level ONLY APPLICABLE for the T-orders.
+16/10/2018 - Corrected description of <shipment> address.
+
+Version 1.3 - AMOS 20.12
+28/08/2020 - Renamed <deliveryCondition> to <outgoingIncoterm> and added <incomingIncoterm>.
+01/09/2020 - Changed description fields maximum length. Populated description fields.
+
+Version 1.4 AMOS 21.06
+07/04/2021 - XRJA - added shipTo, shipFrom and shipVia to order detail.
+07/04/2021 - XRJA - added incomingIncoterm, outgoingIncoterm, shipmentCondition and paymentCondition to detail
+09/04/2021 - XRJA - added shipReturn to order detail
+***AMOS_CHANGELOG_END*** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" attributeFormDefault="unqualified" elementFormDefault="unqualified" version="0.1">
+    <!-- TRANSFER_Order -->
+    <xs:element name="transferOrder">
+        <xs:annotation>
+            <xs:documentation>Root element for ORDER form.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="order" type="OrderType">
+                    <xs:annotation>
+                        <xs:documentation>Order to be uploaded/changed/deleted.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute fixed="1.4" name="version" use="required">
+                <xs:annotation>
+                    <xs:documentation>Version of the schema.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <!-- SIMPLE TYPES -->
+    <!-- PRIMITIVE TYPES -->
+    <xs:simpleType name="PositiveIntegerType">
+        <xs:annotation>
+            <xs:documentation>Zero or positive integer</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="2147483647"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="IntegerType">
+        <xs:restriction base="xs:int">
+            <xs:minInclusive value="-2147483648"/>
+            <xs:maxInclusive value="2147483647"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="DoubleType">
+        <xs:annotation>
+            <xs:documentation>Limited to 17 digits overall</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:totalDigits value="17"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PositiveDoubleType">
+        <xs:annotation>
+            <xs:documentation>Zero or positive decimal number</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:totalDigits value="17"/>
+            <xs:minInclusive value="0"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- END OF PRIMITIVE TYPES -->
+    <xs:simpleType name="SimpleDateType">
+        <xs:annotation>
+            <xs:documentation>Date type. ISO8601-date as string or empty string.</xs:documentation>
+            <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([1-9][0-9][0-9][0-9]\-((0[1-9])|(1[0-2]))\-((0[1-9])|([12][0-9])|([3][01])))?"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="SimpleTimeUtcType">
+        <xs:annotation>
+            <xs:documentation>Time type. UTC-time as string or empty string.</xs:documentation>
+            <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(([01][0-9][:][0-5][0-9])|(2[0-3][:][0-5][0-9]))?"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="YesNoType">
+        <xs:annotation>
+            <xs:documentation>Y=YES; N=NO.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Y">
+                <xs:annotation>
+                    <xs:documentation>YES.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="N">
+                <xs:annotation>
+                    <xs:documentation>NO.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="AcSimpleType">
+        <xs:annotation>
+            <xs:documentation>Use for ac register number or ac type. Max. 6 characters.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="6"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PartNumberType">
+        <xs:annotation>
+            <xs:documentation>Type for partnumbers: minLength=1; maxLength=20;</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="32"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PartSerialNumberType">
+        <xs:annotation>
+            <xs:documentation>Type for part-serialnumbers: minLength=1; maxLength=20</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="20"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="PartBatchNumberType">
+        <xs:annotation>
+            <xs:documentation>Type for part-batchnumbers: minLength=1; maxLength=20</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="20"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- END OF SIMPLE TYPES -->
+    <xs:complexType name="PriceType">
+        <xs:annotation>
+            <xs:documentation>Pricing information.</xs:documentation>
+        </xs:annotation>
+        <xs:simpleContent>
+            <xs:extension base="DoubleType">
+                <xs:attribute name="internationalCurrencyCode" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Price currency.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE_EXPORT=address.currency</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=D_CURRENCY</xs:appinfo>
+                        <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=4</xs:appinfo>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:minLength value="1"/>
+                            <xs:maxLength value="3"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="amosReferenceTransferPart">
+        <xs:simpleContent>
+            <xs:extension base="PartNumberType">
+                <xs:attribute fixed="transferPartDefinition" name="base" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Fixed value: "transferPartdefinition".</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="referenceDocument" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>Reference document.</xs:documentation>
+                        <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="AmosAddressType">
+        <xs:all>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Code representing the address in AMOS.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailInformation/detailCreator)=sign.user_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipFromAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipReturnAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipToAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipViaAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/billingAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/issuerAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipViaAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipmentAddress)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/aogDeskEmployee)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/masterSign)=sign.user_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderInformation/orderCreator)=sign.user_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderMandator)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderResponsible)=sign.user_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderVendor)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/pooling/poolParticipant)=address.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/releaseSign)=sign.user_sign</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="name">
+                <xs:annotation>
+                    <xs:documentation>Name in AMOS.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailInformation/detailCreator)=sign.firstname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailInformation/detailCreator)=sign.lastname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipFromAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipReturnAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipToAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipViaAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/billingAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/issuerAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipViaAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipmentAddress)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/aogDeskEmployee)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/masterSign)=sign.firstname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/masterSign)=sign.lastname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderInformation/orderCreator)=sign.firstname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderInformation/orderCreator)=sign.lastname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderMandator)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderResponsible)=sign.firstname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderResponsible)=sign.lastname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderVendor)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/pooling/poolParticipant)=address.name</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/releaseSign)=sign.lastname</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/releaseSign)=sign.firstname</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="contactName">
+                <xs:annotation>
+                    <xs:documentation>Contact name in AMOS.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=address.contact_name</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="address">
+                <xs:annotation>
+                    <xs:documentation>Address in AMOS.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailInformation/detailCreator)=sign.street</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipFromAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipReturnAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipToAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipViaAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/billingAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/issuerAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipViaAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipmentAddress)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/aogDeskEmployee)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/masterSign)=sign.street</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderInformation/orderCreator)=sign.street</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderMandator)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderResponsible)=sign.street</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderVendor)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/pooling/poolParticipant)=adr_details.address</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/releaseSign)=sign.street</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="city">
+                <xs:annotation>
+                    <xs:documentation>City of address in AMOS.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailInformation/detailCreator)=sign.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipFromAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipReturnAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipToAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipViaAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/billingAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/issuerAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipViaAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipmentAddress)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/aogDeskEmployee)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/masterSign)=sign.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderInformation/orderCreator)=sign.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderMandator)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderResponsible)=sign.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderVendor)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/pooling/poolParticipant)=adr_details.city</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/releaseSign)=sign.city</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="zipCode">
+                <xs:annotation>
+                    <xs:documentation>ZIP-code of address in AMOS.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailInformation/detailCreator)=sign.zipcode</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipFromAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipReturnAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipToAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipViaAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/billingAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/issuerAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipViaAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipmentAddress)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/aogDeskEmployee)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/masterSign)=sign.zipcode</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderInformation/orderCreator)=sign.zipcode</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderMandator)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderResponsible)=sign.zipcode</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderVendor)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/pooling/poolParticipant)=adr_details.zip_code</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/releaseSign)=sign.zipcode</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="20"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="country">
+                <xs:annotation>
+                    <xs:documentation>Country of address in AMOS.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=COUNTRY</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=36</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailInformation/detailCreator)=sign.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipFromAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipReturnAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipToAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipViaAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/billingAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/issuerAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipViaAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/addressing/shipmentAddress)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/aogDeskEmployee)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/masterSign)=sign.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderInformation/orderCreator)=sign.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderMandator)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderResponsible)=sign.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/orderVendor)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/pooling/poolParticipant)=adr_details.country</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/releaseSign)=sign.country</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="communicationData" type="ComDataListType">
+                <xs:annotation>
+                    <xs:documentation>Address communication data.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="accountNumbers" type="AccountNumbersType">
+                <xs:annotation>
+                    <xs:documentation>Account number defined on currencies tabsheet in Address Administration</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="ComDataListType">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="communicationData" type="ComDataType">
+                <xs:annotation>
+                    <xs:documentation>Address communication data.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ComDataType">
+        <xs:sequence>
+            <xs:element name="type">
+                <xs:annotation>
+                    <xs:documentation>Type of communication data.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=adr_communication_type.code</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="2"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="value">
+                <xs:annotation>
+                    <xs:documentation>Value of communication data.</xs:documentation>
+                    <xs:documentation>Max. Length: 50 characters.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=adr_communication.communication_number</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="50"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="description">
+                <xs:annotation>
+                    <xs:documentation>Description of communication data.</xs:documentation>
+                    <xs:documentation>Max. Length: 36 characters.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=adr_communication.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="OrderType">
+        <xs:sequence>
+            <xs:element name="orderNumber">
+                <xs:annotation>
+                    <xs:documentation>The document's order-number.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.orderno</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="orgOrderNumber">
+                <xs:annotation>
+                    <xs:documentation>Original order-number after a change.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.orderno</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="orderHeader" type="OrderHeaderType">
+                <xs:annotation>
+                    <xs:documentation>The document`s workorder-number.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="orderDetail" type="OrderDetailType">
+                <xs:annotation>
+                    <xs:documentation>Order detail (item).</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="OrderHeaderType">
+        <xs:all>
+            <xs:element name="orderType">
+                <xs:annotation>
+                    <xs:documentation>Order types available in AMOS. 
+B  =  SB ORDER
+BF =  BUYER FURNISHED EQUIPMENT                    
+C  =  CUSTOMER LOAN                        
+CP =  CUSTOMER PROVISION ORDER             
+CU =  CUSTOMER PROVISION RETURN ORDER      
+D  =  RETURN DELIVERY                      
+E  =  CONTRACT REORDER                     
+IR =  INCOMING REQUEST                     
+IU =  INCOMING REQ. IN ADV. RETURN         
+IY =  INCOMING REQUEST IN ADVANCE          
+L  =  LOAN ORDER                           
+LU =  LOAN RETURN ORDER                    
+MP =  MATERIAL PRODUCTION                  
+OR =  OUTGOING REQUEST                     
+OU =  OUTGOING RETURN ORDER                
+OY =  OUTGOING REQUEST IN ADVANCE          
+P  =  PURCHASE ORDER                       
+PR =  POOL REQUEST ORDER                   
+Q  =  REQUEST FOR QUOTATION                
+R  =  REPAIR ORDER                         
+RC =  CUSTOMER REPAIR ORDER                
+RU =  REPAIR ORDER RETURN                  
+S  =  SERVICE ORDER                        
+SI =  CONSIGNMENT STOCK INCOMING ORDER     
+SP =  CONSIGNMENT STOCK PURCHASE ORDER     
+SU =  CONSIGNMENT STOCK RETURN ORDER       
+SV =  CONSIGNMENT STOCK SALES ORDER        
+V  =  SALES ORDER                          
+W  =  WARRANTY REPAIR                      
+X  =  EXCHANGE ORDER                       
+Y  =  EXCHANGE IN ADVANCE                  
+YU =  EXCHANGE IN ADV. RETURN              
+PU =  POOL REQUEST RETURN ORDER
+... (or any other value defined in AMOS)</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.order_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER_TYPE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="2"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="orderState">
+                <xs:annotation>
+                    <xs:documentation>The order's state. O = Open, C = Closed.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.state</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER_STATE</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=2</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="0"/>
+                        <xs:maxLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="orderStatus" type="IntegerType">
+                <xs:annotation>
+                    <xs:documentation>Order status: 0 = Open, 1 = Open but booked for X-Orders, 2 = In Repair Administration, 3=... etc.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.status</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="orderDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date when the order was issued.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.orderdate</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderText" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>An order's header text.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.header_text</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderPriority">
+                <xs:annotation>
+                    <xs:documentation>Priority of the order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.priority</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER_PRIO</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="10"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderTypeFor">
+                <xs:annotation>
+                    <xs:documentation>Only used in Q-Orders. Tells for which order type the Q-Order is valid.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.order_type_for</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER_TYPE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="2"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="extendedState">
+                <xs:annotation>
+                    <xs:documentation>Extended state of order. Still experimental, ask Swiss-AS before using it.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.ext_state</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="2"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderClosingDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Closing date of the order. Booking date you will find in the history.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.closing_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="releaseSign" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>User who released this order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.release_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="masterSign" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Who needs to master sign the order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.master_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderResponsible" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Responsible user for this order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.responsible</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderMandator" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Order mandator.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.mandator</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="orderVendor" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Vendor, supplier or customer in this order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="addressing" type="AddressingType">
+                <xs:annotation>
+                    <xs:documentation>Collection of addresses used in the order.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="aogDeskEmployee" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>AOG partner. Used in "Issue Temp Packingsheet" in Pool Request Administration.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.aog_desk_employee</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="parentOrder">
+                <xs:annotation>
+                    <xs:documentation>Holds the orderno from which this order was created.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.created_from_orderno_i</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="externalOrdernumber">
+                <xs:annotation>
+                    <xs:documentation>External orderno.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.ext_orderno</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="30"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="orderCurrency">
+                <xs:annotation>
+                    <xs:documentation>Currency used in this order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.currency</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_CURRENCY</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="entityCode">
+                <xs:annotation>
+                    <xs:documentation>Unique code identifying the financial entity of the order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=entity_header.entity_code</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_ENTITY_CODE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <!-- incomingIncoterm -->
+            <xs:element minOccurs="0" name="incomingIncoterm" type="IncotermType">
+                <xs:annotation>
+                    <xs:documentation>Incoming incoterm for this order.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <!-- outgoingIncoterm -->
+            <xs:element minOccurs="0" name="outgoingIncoterm" type="IncotermType">
+                <xs:annotation>
+                    <xs:documentation>Outgoing incoterm for this order. Corresponds to the delivery condition.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <!-- shipmentCondition -->
+            <xs:element minOccurs="0" name="shipmentCondition" type="Code4DescType">
+                <xs:annotation>
+                    <xs:documentation>Shipment conditions for this order.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <!-- paymentCondition -->
+            <xs:element minOccurs="0" name="paymentCondition" type="Code4DescType">
+                <xs:annotation>
+                    <xs:documentation>Payment conditions for this order.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="remarks" type="HeaderRemarksType">
+                <xs:annotation>
+                    <xs:documentation>An order's remarks.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <!-- flags -->
+            <xs:element minOccurs="0" name="pooling" type="PoolingType">
+                <xs:annotation>
+                    <xs:documentation>Only used for order types IY,IR,OY,OR</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="flags" type="FlagsType">
+                <xs:annotation>
+                    <xs:documentation>Collection of order flags, e.g. on hold, readyForShipment, customer repair, etc.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderInformation" type="OrderInformationType">
+                <xs:annotation>
+                    <xs:documentation>Additional order information: order creator and responsible, creation date and print count.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="surcharges" type="SurchargesType">
+                <xs:annotation>
+                    <xs:documentation>Main additional charges for the order.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="fromStore" type="StationStoreType">
+                <xs:annotation>
+                    <xs:documentation>ONLY for T-Orders
+This section contains the station and store from where the part should be transferred</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="toStore" type="StationStoreType">
+                <xs:annotation>
+                    <xs:documentation>ONLY for T-Orders
+This section contains the station and store where the part should be transferred to</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="SurchargesType">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" name="surcharge" type="SurchargeType">
+                <xs:annotation>
+                    <xs:documentation>Main additional charge for the order.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="HeaderRemarksType">
+        <xs:all minOccurs="0">
+            <xs:element minOccurs="0" name="orderRemarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>An order's remarks.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.header_remarks</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="financialRemarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>An order's financial remarks.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.financial_remarks</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipmentRemarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Remark for shipment. Used in "Issue Temp Packingsheet" in Pool Request Administration.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.ship_remarks</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="OrderDetailType">
+        <xs:all>
+            <!-- posno -->
+            <xs:element name="position">
+                <xs:annotation>
+                    <xs:documentation>Item position on order.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.posno</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:int">
+                        <xs:minInclusive value="0"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="aircraftRegistration" type="AcSimpleType">
+                <xs:annotation>
+                    <xs:documentation>Holds the A/C registration for some orders, not all.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.ac_registr</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="aircraftReceiver" type="AcSimpleType">
+                <xs:annotation>
+                    <xs:documentation>Holds information for ASTRE, made for RAE.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.ac_receiver</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="detailState">
+                <xs:annotation>
+                    <xs:documentation>Detail's state: O: Open, C: Closed.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.state</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=2</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="0"/>
+                        <xs:maxLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="detailStatus" type="IntegerType">
+                <xs:annotation>
+                    <xs:documentation>Status of order. 0: Open order, 1: Booked, 2: Is in Repair Administration</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.status</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="extendedState">
+                <xs:annotation>
+                    <xs:documentation>Extended state of detail.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.ext_state</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="2"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="detailPriority">
+                <xs:annotation>
+                    <xs:documentation>Priority of the detail.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.priority</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="10"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="detailText" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A detail's text.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.detail_text</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="partNumber" type="amosReferenceTransferPart">
+                <xs:annotation>
+                    <xs:documentation>Partno which is on this detail.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.partno</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="serialNumber" type="PartSerialNumberType">
+                <xs:annotation>
+                    <xs:documentation>Serialno which is on this detail.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.serialno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="specification">
+                <xs:annotation>
+                    <xs:documentation>Free text to enter specifications for the part or order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.specification</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="50"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="measureUnit" type="MeasureUnitType">
+                <xs:annotation>
+                    <xs:documentation>Holds the internal measure unit for the time when the order was created.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="orderQuantity" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Ordered quantity.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.qty</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="backorderQuantity" type="xs:double">
+                <xs:annotation>
+                    <xs:documentation>Tells you the state of the order. qty = backorder -&gt; Order is open, nothing delivered yet. qty != backorder, backorder &gt; 0 -&gt; Open, partly delivered. backorder = 0, Order is closed.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.backorder</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="purchasePrice" type="PriceType">
+                <xs:annotation>
+                    <xs:documentation>Price for a single item with currency.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.purch_pricec</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="totalPrice" type="PriceType">
+                <xs:annotation>
+                    <xs:documentation>Total amount for all units on one detail entry with currency.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.amountc</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="exchangeRate" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Exchange rate for the foreign currency at the time when the order was created.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.rate</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="discount" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Discount given for an detail.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.discount</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="targetDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Target date of the detail.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.target_date</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="targetTime" type="SimpleTimeUtcType">
+                <xs:annotation>
+                    <xs:documentation>Time for target date.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.target_time</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="originalTargetDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Used as return target date for IR-Orders.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.orig_target_date</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="confirmedDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Confirmed date for the detail.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.confirmed_date</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="receivedDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Delivery date of the detail.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.del_date</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="financialInformation" type="FinancialInformationType">
+                <xs:annotation>
+                    <xs:documentation>Financial information.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="detailReason" type="Code6DescType">
+                <xs:annotation>
+                    <xs:documentation>Reason for ordering this detail.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="requiredCondition" type="Code6DescType">
+                <xs:annotation>
+                    <xs:documentation>Required condition for this detail.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="requiredWork" type="Code6DescType">
+                <xs:annotation>
+                    <xs:documentation>Used for transfer</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="poolName" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Reference to a pool.</xs:documentation>
+                    <xs:appinfo>AMOS_NOT_FILLED</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="labelNumber" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Reference to a (removal-) label.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.labelno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="detailRemarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>A detail's remarks.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.detail_remarks</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="flags" type="DetailFlagsType">
+                <xs:annotation>
+                    <xs:documentation>Collection of order detail flags, e.g. free of charge, agreed price, warranty, etc.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="reminder" type="ReminderType">
+                <xs:annotation>
+                    <xs:documentation>Order detail reminder information.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="detailInformation" type="DetailInformationType">
+                <xs:annotation>
+                    <xs:documentation>Additional order detail information: detail creator and creation date.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="partInformation" type="PartInformationType">
+                <xs:annotation>
+                    <xs:documentation>Additional information about the part number ordered in this detail.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipmentInformation" type="ShipmentInformationType">
+                <xs:annotation>
+                    <xs:documentation>Additional information about the detail’s shipment.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <!-- order overview -->
+            <xs:element minOccurs="0" name="overview" type="OverviewType">
+                <xs:annotation>
+                    <xs:documentation>Order overview information.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <!-- generic extension point for custom data -->
+            <xs:element minOccurs="0" name="orderDetailExtension" type="xs:anyType">
+                <xs:annotation>
+                    <xs:documentation>Generic extension point. Internal use only!</xs:documentation>
+                    <xs:appinfo>AMOS_DYNAMIC_TYPE</xs:appinfo>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="loanCostCalculations" type="LoanCostCalculationsType">
+                <xs:annotation>
+                    <xs:documentation>Loan cost calculations.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="surcharges" type="SurchargesType">
+                <xs:annotation>
+                    <xs:documentation>Additional charge for this detail.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="requirements">
+                <xs:annotation>
+                    <xs:documentation>Part requirements.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="requirement" type="RequirementType">
+                            <xs:annotation>
+                                <xs:documentation>Part requirement.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="modifications">
+                <xs:annotation>
+                    <xs:documentation>Modifications.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="modification" type="ModificationType">
+                            <xs:annotation>
+                                <xs:documentation>Modification.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipToAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Address where the order detail is supposed to be sent to (as an outgoing shipment) or received (as an incoming shipment).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.address_ship</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipFromAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Address where the order detail is supposed to be sent from (as an outgoing shipment) or received (as an incoming shipment).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.address_from</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipViaAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Address where the order detail is supposed to be sent via (as an outgoing shipment) or received (as an incoming shipment).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.address_via</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipReturnAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Address where the order detail is supposed to be returned (as an outgoing shipment) or received (as an incoming shipment).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.address_via</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="incomingIncoterm" type="IncotermType">
+                <xs:annotation>
+                    <xs:documentation>Incoming incoterm for this order detail.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="outgoingIncoterm" type="IncotermType">
+                <xs:annotation>
+                    <xs:documentation>Outgoing incoterm for this order detail. Corresponds to the delivery condition.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipmentCondition" type="Code4DescType">
+                <xs:annotation>
+                    <xs:documentation>Shipment conditions for this order detail.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="paymentCondition" type="Code4DescType">
+                <xs:annotation>
+                    <xs:documentation>Payment conditions for this order detail.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="RequestedType">
+        <xs:sequence>
+            <xs:element name="partNumber" type="amosReferenceTransferPart">
+                <xs:annotation>
+                    <xs:documentation>Part number of the requested part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.requested_partno</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.partno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="serialNumber" type="PartSerialNumberType">
+                <xs:annotation>
+                    <xs:documentation>Serial number of the requested part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.serialno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ROTABLE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="date" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date the request took place.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.orderdate</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="aircraftRegistration" type="AcSimpleType">
+                <xs:annotation>
+                    <xs:documentation>Holds the A/C registration for which the part is requested.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.ac_registr</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderNumber">
+                <xs:annotation>
+                    <xs:documentation>Order number of the order in which the part is requested.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.orderno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="externalOrderNumber">
+                <xs:annotation>
+                    <xs:documentation>External order number of the order in which the part is requested.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.ext_orderno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="30"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="provider">
+                <xs:annotation>
+                    <xs:documentation>Provider of the part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.vendor</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="reason">
+                <xs:annotation>
+                    <xs:documentation>Description of the reason the part is requested.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=reason.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ReceivedType">
+        <xs:sequence>
+            <xs:element name="partNumber" type="amosReferenceTransferPart">
+                <xs:annotation>
+                    <xs:documentation>Part number of the received part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.partno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:choice minOccurs="0">
+                <xs:element minOccurs="0" name="serialNumber" type="PartSerialNumberType">
+                    <xs:annotation>
+                        <xs:documentation>Serial number of the received part.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE_EXPORT=history.serialno</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="0" name="batchNumber" type="PartBatchNumberType">
+                    <xs:annotation>
+                        <xs:documentation>Batch number of the involved part.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE_EXPORT=history.batchno</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
+            <xs:element minOccurs="0" name="date" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date the receiving took place.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.del_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE_INT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="aircraftRegistration" type="AcSimpleType">
+                <xs:annotation>
+                    <xs:documentation>Holds the A/C registration for which the part is received.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.ac_registr</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="tsn" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Time since new of the received part, in hours.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tsn</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="csn" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Cycles since new of the received part</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.csn</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="installedTah" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Total aircraft hours at the time of installation, in hours.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tah</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="installedTac" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Total aicraft cycles at the time of installation¨.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tac</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedTbi" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Time between installation at removal, in hours.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tbi</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedCbi" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Cycles between installation at removal.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.cbi</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="labelNumber" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Label number at the receiving.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.labelno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_LABEL</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="certificateNumber">
+                <xs:annotation>
+                    <xs:documentation>Rotable release number at the receiving.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.releaseno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="40"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="receivingNumber">
+                <xs:annotation>
+                    <xs:documentation>Receiving number.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.voucherno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="20"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="awbNumber">
+                <xs:annotation>
+                    <xs:documentation>Receiving ABW number.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=sh_header.awbno</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.awbno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_AWB</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="24"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="installationDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Last installation date.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.del_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE_INT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Last removal date.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.del_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE_INT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedPosition">
+                <xs:annotation>
+                    <xs:documentation>Last position where the part was installed.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.location</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_LOCATION_STR</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="16"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="manufactureDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Manufacturing date of the part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=rotables.mfg_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="InstalledType">
+        <xs:sequence>
+            <xs:element name="partNumber" type="amosReferenceTransferPart">
+                <xs:annotation>
+                    <xs:documentation>Part number of the involved part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.partno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:choice minOccurs="0">
+                <xs:element minOccurs="0" name="serialNumber" type="PartSerialNumberType">
+                    <xs:annotation>
+                        <xs:documentation>Serial number of the involved part.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE_EXPORT=history.serialno</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="0" name="batchNumber" type="PartBatchNumberType">
+                    <xs:annotation>
+                        <xs:documentation>Batch number of the involved part.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE_EXPORT=history.batchno</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
+            <xs:element minOccurs="0" name="date" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date the booking took place.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.del_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE_INT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="aircraftRegistration" type="AcSimpleType">
+                <xs:annotation>
+                    <xs:documentation>Holds the A/C registration for some overview sections.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.ac_registr</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="labelNumber" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Label number at the installation.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.labelno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_LABEL</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="tsn" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Time since new of the part, in hours.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tsn</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="csn" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Cycles since new of the part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.csn</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="tah" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Total aircraft hours at installation time.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tah</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="tac" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Total aircraft cycles at installation time.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tac</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="position">
+                <xs:annotation>
+                    <xs:documentation>Position of the installed part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.location</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_LOCATION_STR</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="16"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="manufactureDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Manufacturing date of the part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=rotables.mfg_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="SentType">
+        <xs:sequence>
+            <xs:element name="partNumber" type="amosReferenceTransferPart">
+                <xs:annotation>
+                    <xs:documentation>Part number of the involved part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.partno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:choice minOccurs="0">
+                <xs:element minOccurs="0" name="serialNumber" type="PartSerialNumberType">
+                    <xs:annotation>
+                        <xs:documentation>Serial number of the involved part.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE_EXPORT=history.serialno</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+                <xs:element minOccurs="0" name="batchNumber" type="PartBatchNumberType">
+                    <xs:annotation>
+                        <xs:documentation>Batch number of the involved part.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE_EXPORT=history.batchno</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    </xs:annotation>
+                </xs:element>
+            </xs:choice>
+            <xs:element minOccurs="0" name="date" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date the booking took place.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.del_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE_INT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="aircraftRegistration" type="AcSimpleType">
+                <xs:annotation>
+                    <xs:documentation>Holds the A/C registration for some overview sections.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.ac_registr</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderNumber">
+                <xs:annotation>
+                    <xs:documentation>Order number of the order in which the part is sent.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.orderno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="tsn" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Time since new at the removal, in hours.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tsn</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="csn" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Cycles since new at the removal.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.csn</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date of removal.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.del_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE_INT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedTah" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Total aircraft hours at the removal, in hours.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tah</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedTac" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Total aircraft cycles at removal.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tac</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedTbi" type="PositiveDoubleType">
+                <xs:annotation>
+                    <xs:documentation>Time between installation at removal, in hours.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.tbi</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedCbi" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Cycles between installation at removal.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.cbi</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="removedReason">
+                <xs:annotation>
+                    <xs:documentation>Removal reason.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.reason</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="labelNumber" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Label number.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=history.labelno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_LABEL</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="awbNumber">
+                <xs:annotation>
+                    <xs:documentation>ABW number of the order in which the part was sent.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=sh_header.awbno</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.awbno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_AWB</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="24"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="manufactureDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Manufacturing date of the part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=rotables.mfg_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="StationStoreType">
+        <xs:sequence>
+            <xs:element name="station">
+                <xs:annotation>
+                    <xs:documentation>The station where the part is to be transfer from/to.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=station_store.station</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="store">
+                <xs:annotation>
+                    <xs:documentation>The store where the part is to be transfer from/to.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=A_STORE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=station_store.store</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="PoolingType">
+        <xs:all>
+            <xs:element minOccurs="0" name="costcenter">
+                <xs:annotation>
+                    <xs:documentation>Costcenter for this order. Depends on A/C, Pool or can be manually inserted.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.costcenter</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_COST_CENTER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="poolReason" type="PoolReasonType">
+                <xs:annotation>
+                    <xs:documentation>Pool reason.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="poolParticipant" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Pool participant on order. Could be a partner or a provider.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.pool_requestno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="poolAircraftType">
+                <xs:annotation>
+                    <xs:documentation>A/C type for which this order is requested.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.pool_ac_typ</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=E_AC_TYPE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="poolRequestNumber">
+                <xs:annotation>
+                    <xs:documentation>Requestno for pool orders.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.pool_requestno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="poolCertificateNumber">
+                <xs:annotation>
+                    <xs:documentation>Certificate number. Used in "Issue Temp Packingsheet" in Pool Request Administration.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.certified_correct</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="PoolReasonType">
+        <xs:all>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Pool reason. (AMOS code for a predefined reason.)</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.pool_reason</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="description">
+                <xs:annotation>
+                    <xs:documentation>Description of the pool reason.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.pool_reason</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="FlagsType">
+        <xs:all>
+            <xs:element minOccurs="0" name="readyForShipment" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>When "Y" order is waiting for shipment or on shipment.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.ready_for_shipment</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="onHold" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Order is on hold. (Done in Repair Administration.)</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.on_hold</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="regularisation" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>If this is set to "Y" this order is used for financial issues (only for V-Orders).</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.regularisation</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="recharge" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>If the order should be recharge to another customer (set to "Y").</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.recharge</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="internalRepair" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>If set to "Y" then this is an internal repair order.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.internal_repair</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="customerRepair" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>If set to "Y" then this order is an customer repair order.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.customer_repair</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <!-- additional order information -->
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="OrderInformationType">
+        <xs:all>
+            <xs:element minOccurs="0" name="orderCreator" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>AMOS user that created the order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.created_by</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="orderCreationDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date the order was created on.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.created_date</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="printCountShipment" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Counts how many times an order was already printed from shipment.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.print_count</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="printCountOrderManagement" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Counting how many times an order was printed from the AMOS application "Order Management".</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.print_count_om</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="SurchargeType">
+        <xs:all>
+            <xs:element name="amount">
+                <xs:annotation>
+                    <xs:documentation>The amount of the surcharge.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_surcharges.amount</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="DoubleType">
+                        <xs:fractionDigits value="2"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="unit">
+                <xs:annotation>
+                    <xs:documentation>The currency of the surcharge or %.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_surcharges.unit</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="type">
+                <xs:annotation>
+                    <xs:documentation>Type of the surcharge (Basic-Data Administration -&gt; Invoice Checking -&gt; Charge type).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_surcharges.charge</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="description">
+                <xs:annotation>
+                    <xs:documentation>Closer description of the type of the surcharge.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_charge_type.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="RequirementType">
+        <xs:all>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Requirement code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=requirement_type.requirement</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="2"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="type">
+                <xs:annotation>
+                    <xs:documentation>Requirement type</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=requirement_type.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="description">
+                <xs:annotation>
+                    <xs:documentation>Requirement description</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part_requirement.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="250"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="expirationDate" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Expiration date or "Not Installed"</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="ModificationType">
+        <xs:all>
+            <xs:element name="status" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Modifition status</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="documentNumber">
+                <xs:annotation>
+                    <xs:documentation>The number of the document.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=doc_header.docno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=E_DOC_HEADER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="35"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="documentType">
+                <xs:annotation>
+                    <xs:documentation>Type of the document: Only types which are defined in "Basic Data Administration -&gt; Document Type" are valid. e.g. SB, AD, ...</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=doc_header.doc_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="revision">
+                <xs:annotation>
+                    <xs:documentation>The revision number of the document.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=doc_header.revision</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="documentStatus" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The status of the document</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="text" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Concatenated value of the subject texts</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=doc_header.text</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=doc_header.text2</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="carryOutText" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Carry out text</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=doc_carry_out.text</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="plateStatusMatchFor" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Plate status is maching for</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="LoanCostCalculationsType">
+        <xs:sequence>
+            <xs:element name="runningTotal" type="PriceType">
+                <xs:annotation>
+                    <xs:documentation>Calculated total running loan cost.</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="estimatedTotal" type="PriceType">
+                <xs:annotation>
+                    <xs:documentation>Calculated total estimated loan cost.</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="OverviewType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="requested" type="RequestedType">
+                <xs:annotation>
+                    <xs:documentation>Overview Information on REQUESTED part.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="received" type="ReceivedType">
+                <xs:annotation>
+                    <xs:documentation>Overview Information on RECEIVED part.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="installed" type="InstalledType">
+                <xs:annotation>
+                    <xs:documentation>Overview Information on INSTALLED part.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="sent" type="SentType">
+                <xs:annotation>
+                    <xs:documentation>Overview Information on SENT part.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="ShipmentInformationType">
+        <xs:all>
+            <xs:element minOccurs="0" name="awbNumber">
+                <xs:annotation>
+                    <xs:documentation>The detail's AWB number.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.awbno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="24"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="awbDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>The detail's AWB date.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.awb_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="PartInformationType">
+        <xs:all>
+            <xs:element minOccurs="0" name="ataChapter">
+                <xs:annotation>
+                    <xs:documentation>The part number's ATA chapter.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part.ata_chapter</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=G_ATA_CHAPTER_STR</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="materialClass">
+                <xs:annotation>
+                    <xs:documentation>The part number's material class. R=Rotable; C=Consumable; S=Service; E=Expandable; or custom type (see basic table Material Class). Max. 4 characters</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part.mat_class</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=MAT_CLASS</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="repairable" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Flag indication if the part number is repairable.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part.repairable</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="fixedAsset" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Flag indicating if the part should be considered as a fixed asset</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part.fixed_asset</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="defaultRepair">
+                <xs:annotation>
+                    <xs:documentation>Default repair location.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part.default_repair</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_ADDRESS</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="description">
+                <xs:annotation>
+                    <xs:documentation>The part number's description text.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="stockAccount">
+                <xs:annotation>
+                    <xs:documentation>Stock account number.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=basic_account.accountno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_ACCOUNT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="10"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="stationFrom">
+                <xs:annotation>
+                    <xs:documentation>The part number's from station.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=pickslip_header.station_from</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="DetailInformationType">
+        <xs:all>
+            <xs:element minOccurs="0" name="detailCreator" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>AMOS user that created the detail.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.created_by</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="detailCreationDate" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date the detail was created</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.created_date</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="ReminderType">
+        <xs:all>
+            <xs:element name="reminderCount" type="PositiveIntegerType">
+                <xs:annotation>
+                    <xs:documentation>Counts how many reminders were already send.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER_0</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.reminder_count</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="lastReminder" type="SimpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date of last reminder.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.reminder_date</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="DetailFlagsType">
+        <xs:all>
+            <xs:element minOccurs="0" name="freeOfCharge" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Shows if the detail is free of charge or not.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.free_of_charge</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="directConsumption" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Will tell if the part should be consumed directly after receiving. Only consumables.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.direct_consumption</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="taxable" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Shows if the detail is taxable. Just for information not logic behind it.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.taxable</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="requirementChecked" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Holds information if the requirements on that detail are already checked.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.req_checked</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="agreedPrice" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Indicates if an order price is agreed with the vendor. If value is `Y` the price is agreed, if value is `N` or empty the price is not agreed.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.agreed_price</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="warranty" type="YesNoType">
+                <xs:annotation>
+                    <xs:documentation>Shows if the detail is under warranty.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.warranty</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="MeasureUnitType">
+        <xs:all>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Measure unit code. (AMOS 4 characters long code for a predefined measure unit.)</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.measure_unit</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_MEASURE_UNIT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="description">
+                <xs:annotation>
+                    <xs:documentation>Measure unit description.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=measure_unit.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="FinancialInformationType">
+        <xs:all>
+            <xs:element name="costType">
+                <xs:annotation>
+                    <xs:documentation>Will hold the cost type of the detail.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.cost_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_COST_TYPE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="10"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="costCenter">
+                <xs:annotation>
+                    <xs:documentation>Will hold the corresponding costcenter for a detail.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.costcenter</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_COST_CENTER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="costCenterIRIS">
+                <xs:annotation>
+                    <xs:documentation>Used for IRIS interface only.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.costcenter2</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_COST_CENTER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="projectNumber">
+                <xs:annotation>
+                    <xs:documentation>Projectno from AMSO CMM.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.projectno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_PROJECT_STR</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="14"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="budgetNumber">
+                <xs:annotation>
+                    <xs:documentation>Budget number.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.budgetno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="14"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="AddressingType">
+        <xs:all>
+            <xs:element minOccurs="0" name="shipmentAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Address where the order is supposed to be sent (as an outgoing shipment) or received (as an incoming shipment).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.address_ship</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.goods_destination</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="billingAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Bill to address.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.address_bill</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="issuerAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Order issued by address.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.address_issue</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="shipViaAddress" type="AmosAddressType">
+                <xs:annotation>
+                    <xs:documentation>Order`s Ship via address.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=od_header.address_via</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="AccountNumbersType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="creditorAccountNumber">
+                <xs:annotation>
+                    <xs:documentation>Creditor account number defined on address for respective currency of order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=adr_currency.accountno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_ACCOUNT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="10"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="debitorAccountNumber">
+                <xs:annotation>
+                    <xs:documentation>Debitor account number defined on address for respective currency of order.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=adr_currency.accountno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_ACCOUNT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="10"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="IncotermType">
+        <xs:all>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Code.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/incomingIncoterm)=od_detail.incoterm_incoming</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/outgoingIncoterm)=od_detail.incoterm_outgoing</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/incomingIncoterm)=od_header.incoterm_incoming</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/outgoingIncoterm)=od_header.deliverycond</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="description">
+                <xs:annotation>
+                    <xs:documentation>Description.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/incomingIncoterm)=deliverycond.description</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/outgoingIncoterm)=deliverycond.description</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/incomingIncoterm)=deliverycond.description</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/outgoingIncoterm)=deliverycond.description</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="50"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="Code4DescType">
+        <xs:all>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Code.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/paymentCondition)=od_detail.payment_condition</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipmentCondition)=od_detail.shipment_condition</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/paymentCondition)=od_header.paymentcond</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/shipmentCondition)=od_header.shipment</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="4"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="description">
+                <xs:annotation>
+                    <xs:documentation>Description.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/paymentCondition)=paymentcond.description</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/shipmentCondition)=shipment.description</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/paymentCondition)=paymentcond.description</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderHeader/shipmentCondition)=shipment.description</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <xs:complexType name="Code6DescType">
+        <xs:all>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Code.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_NOT_FILLED</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailReason)=od_detail.reason</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/requiredCondition)=od_detail.req_condition</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="description">
+                <xs:annotation>
+                    <xs:documentation>Description.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_NOT_FILLED</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/detailReason)=condition.description</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT(/transferOrder/order/orderDetail/requiredCondition)=condition.description</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+</xs:schema>

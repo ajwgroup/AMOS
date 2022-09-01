@@ -46,6 +46,14 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void TransferOrderFromXmlOrderHeader14_PassesFile_ReturnsExpectedValueForOrder()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER_1_4.xml")));
+            Assert.AreEqual("PX0000001", transportEnvelope.GetPayload<AMOS.Models.TRANSFER_ORDER.v1_4.transferOrder_1_4>().order.First().orderNumber);
+        }
+
+
+        [TestMethod]
         public void TransferOrderFromXmlPart_PassesFile_ReturnsExpectedValueForOrder()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER_0_14.xml")));
