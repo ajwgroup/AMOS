@@ -104,6 +104,13 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void TransferPartDefintionFromXml_PassesFile_2_0_ReturnsExpectedValueForOrder()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_PART_DEFINITION_6773E010000.xml")));
+            Assert.AreEqual("6773E010000", transportEnvelope.GetPayload<AMOS.Models.TRANSFER_PART_DEFINITION.v2_0.transferPartDefinition_2_0>().part.First().partNumber);
+        }
+
+        [TestMethod]
         public void TransferExportComponentHistory_PassesFile_ReturnsExpectedValue()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("EXPORT_COMPONENT_HISTORY_2_3.xml")));
