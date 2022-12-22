@@ -310,6 +310,13 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void FromXml_ReturnsTransferWorkorder2_6()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_WORKORDER_2_6.xml")));
+            Assert.AreEqual("111111111", transportEnvelope.GetPayload<AMOS.Models.TRANSFER_WORKORDER.v2_6.transferWorkorder2_6>().workorder.First().workorderNumber);
+        }
+
+        [TestMethod]
         public void FromXml_ReturnsTransferShipment1_2_ReturnsVersion0_1()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment_0_1.xml")));

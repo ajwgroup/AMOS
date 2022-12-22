@@ -59,6 +59,9 @@
     <None Update="TRANSFER_SHIPMENT_1_3.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TRANSFER_WORKORDER_2_6.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,2925 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2012 (YJME) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+WO transfer layout for workorder 2.0
+
+Version 2.0 - AMOS 10.10
+30/08/2012 - New structure of data introduced fitting to workorder and inspired on MRO interfaces 
+08/11/2012 - Include <dueData> in the <transferData>
+           - Set <transferReason> and <transferStation> as optional
+           - Set <closingLeg> as optional
+11/12/2012 - Set to unlimited the max-length of the <remark> field in reference-level according to corresponding column db_link.link_remarks in the DB 
+
+Version 2.01 - AMOS 10.20
+07/02/2013 - Add a flag in the workorderHeader-level (in <transferData>) to indicate if the workorder was transferred as a CDL 
+24/04/2013 - Add a workstep state field in the workstep-level according to new logic introduced in the workorder
+28/05/2013 - Add workorder sub-type flags in header/aircraft-level
+           - Add <routineChecks> list in header/aircraft-level
+           - Add <removedInServiceableCondition> flag in header/component-level
+           - Complete transfer-level with new fields about the kind of transfer (DD,CDL or MEL): <transferType>, <ataReference> and <melCategory>
+           - Complete closing-level with new fields <closingTime>, <closingTAH>, <closingTAC> and <closingSign>
+           - Add a new <certification> segment under transfer-level
+           - Add a new <releaseToService> segment under transfer-level
+           - Add <classifications>, <statistics> and <requests> flags in workorderHeader-level and workstep-level
+           - Add <uplifts> segment in action-level containing oil, hydraulic and tire uplifts
+
+Version 2.02 - AMOS 10.30
+22/07/2013 - Added a flag <closingAction> on the action-level
+           - Add UUID attributes to following levels:
+           - transferData,
+           - resourceRequirement,
+           - constraint (under resourceRequirements level),
+           - time booking,
+           - references (under Workorder, Workstep and Action levels)
+           - several fields can now be empty 
+15/10/2013 - made <workorderNumber>, <aircraftType> and <partRequest>/<description> optional
+24/03/2014 - added mime type annotations
+
+Version 2.1 - AMOS 10.70
+21/01/2015 - extended reference structure
+           - added downloadable links  
+13/05/2015 - corrected mapping for field closingStation
+17/06/2015 - added/enhanced annotations for fields under downloadableLink-level
+14/08/2015 - Added <entityCode> to <workorder><workStep><actions><timeBookingType> 
+
+Version 2.2 - AMOS 11.30
+06/01/2017 - Enlarged field <issueData>/<issueLeg> and <closingData>/<closingLeg> from 8 to 9 characters
+25/01/2017 - Enhanced database mappings
+30/01/2017 - Added a new optional attribute <uuid> to the <workpackageName> field under the workorderHeader-level
+10/02/2017 - wo_transfer.transfer_station length is reduced from 6 to 4
+
+Version 2.3 - AMOS 11.40
+03/05/2017 - Part numbers up to 32 characters are supported for the <partNumber> field.
+
+Version 2.4 - AMOS 12.00
+24/08/2017 - Added a new optional attribute <barcode> to the <workpackageName> field under the workorderHeader-level
+08/09/2017 - Added <workorderHeader>/<priority> and <partRequest>/<tool>
+
+Version 2.5 - AMOS 19.6
+11/04/2019 - Added a new optional element <externalWorkorderNumber/> to the <workorderHeader/>.
+11/04/2019 - Added a new optional element <airworthinessDirective/> to the <classifications/> field in <workStepType/>.
+15/04/2019 - Added togo values in <transferDue> section and support for non-system counters
+
+Version 2.6 - AMOS 19.12
+23/08/2019 - Added <limitations> under transfer-level
+30/08/2019 - Added <consequences> to limitations. Consequences have the elements <code> and <description>.
+22/10/2019 - Updated database mapping of <ipcReference> and enlarged the field to 80 characters.
+***AMOS_CHANGELOG_END*** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" attributeFormDefault="unqualified" elementFormDefault="unqualified" version="2.02">
+    <!--===ROOT===TRANSFER_WORKORDER===-->
+    <xs:element name="transferWorkorder">
+        <xs:annotation>
+            <xs:documentation>Root element for WORKORDER form.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element maxOccurs="unbounded" minOccurs="0" name="workorder" type="workorderType">
+                    <xs:annotation>
+                        <xs:documentation>Workorders to be exported/imported.</xs:documentation>
+                    </xs:annotation>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute fixed="2.6" name="version" use="required">
+                <xs:annotation>
+                    <xs:documentation>Version of the schema.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <!--===AMOS REFERENCE TYPES===-->
+    <xs:complexType name="amosReferenceExportStructuralDamage">
+        <xs:simpleContent>
+            <xs:extension base="positiveInteger">
+                <xs:attribute fixed="exportStructuralDamage" name="base" use="required">
+                    <xs:annotation>
+                        <xs:documentation>Indication of the AIM service used to produce the XML file containing the structural damage information.</xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="referenceDocument" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>Reference of the XML file containing the structural damage information.</xs:documentation>
+                        <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <!--===COMMON COMPLEX TYPES===-->
+    <!-- DownloadableLink -->
+    <xs:complexType name="downloadableLinkType">
+        <xs:sequence>
+            <xs:element name="url" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Complete download URL for this linked document.</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="mimeType" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>The linked document content's mime type (e.g. "application/octet-stream").</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="sizeKb" type="xs:long">
+                <xs:annotation>
+                    <xs:documentation>The linked document's size in kilobytes.</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="filename">
+                <xs:annotation>
+                    <xs:documentation>The linked document's name.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=ste_metadata.meta_value</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="120"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="lastModified" type="xs:dateTime">
+                <xs:annotation>
+                    <xs:documentation>The date and time when the linked document was modified.</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- ReferenceType -->
+    <xs:complexType name="referenceType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="category">
+                <xs:annotation>
+                    <xs:documentation>AMOS link ref type.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=db_link.ref_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="type">
+                <xs:annotation>
+                    <xs:documentation>AMOS link type.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=db_link.destination_type</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.ref_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="reference">
+                <xs:annotation>
+                    <xs:documentation>Referenced document identifier.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=db_link.destination_key</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=255</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="600"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="typeDescription">
+                <xs:annotation>
+                    <xs:documentation>Dynamic description of the link type.</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="32"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="description">
+                <xs:annotation>
+                    <xs:documentation>AMOS link description.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=db_link.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="255"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="remarks">
+                <xs:annotation>
+                    <xs:documentation>Remarks about the reference.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=db_link.link_remarks</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="downloadableLink" type="downloadableLinkType">
+                <xs:annotation>
+                    <xs:documentation>Link information to download the file related with the reference/link.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid" use="optional">
+            <xs:annotation>
+                <xs:documentation>UUID of the reference.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=db_link.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- WORKORDER Type-->
+    <xs:complexType name="workorderType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="workorderNumber" type="positiveInteger">
+                <xs:annotation>
+                    <xs:documentation>Workorder number. On import in AMOS, this number is ignored unless the appropriate option is activated in the interface configuration.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.event_perfno_i</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="workorderHeader">
+                <xs:annotation>
+                    <xs:documentation>Header information of the workorder.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="workorderType">
+                            <xs:annotation>
+                                <xs:documentation>M=Maintenance; P=Pirep; S= Scheduled; C=Cabin</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_header.type</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="8"/>
+                                    <xs:minLength value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="workorderState">
+                            <xs:annotation>
+                                <xs:documentation>State of the workorder: O = open, C = closed</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_header.state</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="2"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="workorderOriginType">
+                            <xs:annotation>
+                                <xs:documentation>Workorder origin type (mandatory for Scheduled WOs): 
+- Documents: AD, SB, EO,....
+- Rotables: "R"
+- Checks: "C" for all mandatory Checks</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_header_4.event_type_mandatory</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="6"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:choice>
+                            <xs:element name="aircraft">
+                                <xs:annotation>
+                                    <xs:documentation>Aircraft related to the workorder.</xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element minOccurs="0" name="aircraftType">
+                                            <xs:annotation>
+                                                <xs:documentation>Aircraft type.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=aircraft.ac_typ</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=E_AC_TYPE</xs:appinfo>
+                                            </xs:annotation>
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:minLength value="2"/>
+                                                    <xs:maxLength value="6"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element name="aircraftRegistration" type="acSimpleType">
+                                            <xs:annotation>
+                                                <xs:documentation>Registration code of the aircraft.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.ac_registr</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=E_AC</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="workorderScheduledSubType">
+                                            <xs:annotation>
+                                                <xs:documentation>Scheduled workorder sub-types.
+ONLY HANDLED IF workorderType = S</xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element minOccurs="0" name="feedbackRequired" type="yesNoType">
+                                                        <xs:annotation>
+                                                            <xs:documentation>Is a feedback required ?
+Only filled if is true.</xs:documentation>
+                                                            <xs:appinfo>AMOS_DATABASE=wo_header_crx.feedback_req</xs:appinfo>
+                                                            <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                    <xs:element minOccurs="0" name="briefingCard" type="yesNoType">
+                                                        <xs:annotation>
+                                                            <xs:documentation>Is there a briefing card required ?
+Only filled if is true.</xs:documentation>
+                                                            <xs:appinfo>AMOS_DATABASE=wo_header_crx.briefing_card</xs:appinfo>
+                                                            <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                    <xs:element minOccurs="0" name="removedInServiceableCondition" type="yesNoType">
+                                                        <xs:annotation>
+                                                            <xs:documentation>Is there a part removed is serviceable condition ?
+Only filled if is true.</xs:documentation>
+                                                            <xs:appinfo>AMOS_DATABASE=wo_header.cannibalized</xs:appinfo>
+                                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                        </xs:annotation>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="routineChecks">
+                                            <xs:annotation>
+                                                <xs:documentation>Routine checks list.
+ONLY HANDLED IF workorderType = S</xs:documentation>
+                                            </xs:annotation>
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element maxOccurs="unbounded" name="routineCheck">
+                                                        <xs:annotation>
+                                                            <xs:documentation>Routine check, e.g. Daily Check.</xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="checkCode">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>Routine check code:
+DC = Daily Check
+WC = Weekly Check
+BWC = Bi-Weekly Check
+PFC = Pre-Flight Check
+MPC = Maintenance Pre-Flight Check
+SOC = Stay Over Check
+TC = Transit Check</xs:documentation>
+                                                                        <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                                                                    </xs:annotation>
+                                                                    <xs:simpleType>
+                                                                        <xs:restriction base="xs:string">
+                                                                            <xs:maxLength value="4"/>
+                                                                            <xs:minLength value="1"/>
+                                                                        </xs:restriction>
+                                                                    </xs:simpleType>
+                                                                </xs:element>
+                                                                <xs:element name="performed" type="yesNoType">
+                                                                    <xs:annotation>
+                                                                        <xs:documentation>Check performed ?
+Y=Yes
+N=No</xs:documentation>
+                                                                        <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                                                                    </xs:annotation>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element name="component">
+                                <xs:annotation>
+                                    <xs:documentation>Component related to the workorder.</xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="partNumber" type="partNumberType">
+                                            <xs:annotation>
+                                                <xs:documentation>Part number of the component.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.comp_partno</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="serialNumber" type="serialNumberType">
+                                            <xs:annotation>
+                                                <xs:documentation>Serial number of the component.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.comp_serialno</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="removedInServiceableCondition" type="yesNoType">
+                                            <xs:annotation>
+                                                <xs:documentation>Is there a part removed is serviceable condition ? Only filled if is true.
+ONLY HANDLED IF workorderType = S</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.cannibalized</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:element minOccurs="0" name="workpackageName" type="workpackageNumberComplexType">
+                            <xs:annotation>
+                                <xs:documentation>Name of the workpackage if workorder is linked to one of them.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wp_header.wpno</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=E_WORKPACKAGE_AC</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="projectNumber">
+                            <xs:annotation>
+                                <xs:documentation>Project number linked to the workorder.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_header.projectno</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=F_PROJECT_STR</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:minLength value="1"/>
+                                    <xs:maxLength value="14"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="barcode">
+                            <xs:annotation>
+                                <xs:documentation>Barcode identifying the workorder to use on printed documentation.</xs:documentation>
+                                <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:minLength value="1"/>
+                                    <xs:maxLength value="16"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="externalWorkorderNumber">
+                            <xs:annotation>
+                                <xs:documentation>External Workorder number, used to have a reference to a workorder number from another system.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_header.ext_workorderno</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="36"/>
+                                    <xs:minLength value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="ataChapter">
+                            <xs:annotation>
+                                <xs:documentation>ATA chapter.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_header.ata_chapter</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=G_ATA_CHAPTER_STR</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:maxLength value="12"/>
+                                    <xs:minLength value="1"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                        <xs:element name="issueData" type="issueType">
+                            <xs:annotation>
+                                <xs:documentation>Issue information for the workorders.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="classifications">
+                            <xs:annotation>
+                                <xs:documentation>Workorder classifications information.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" name="administrativeServiceCheck" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Administrative service check</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.admin_wo_only</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="aogRisk" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>AOG risk</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_crx.aog_risk</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="cdccl" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Critical Design Configuration Control Limitations</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=workstep_classification.cdccl</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="cdcp" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Corrosion Prevention and Control Program</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=workstep_classification.cpcp</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="defectClassification">
+                                        <xs:annotation>
+                                            <xs:documentation>Workorder Classification 
+Defect Class: "H-Handicap / I-Important / M-Minor"
+defined in the Basic Table defect_classification</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.wo_class</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:maxLength value="1"/>
+                                                <xs:minLength value="0"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="occurenceReport" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Occurrence report</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_crx.occurrenc_report</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="opsConsequence" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>OPS consequence</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_4.chk_ops_consequence</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="structuralDamage" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Structural damage</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.struc_damage</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="tal" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Technical Aircraft Log</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.tal</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="maintenanceType">
+                                        <xs:annotation>
+                                            <xs:documentation>Maintenance Type:
+H=Heavy Maintenance
+L=Line Maintenance
+I=Hidden</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_4.event_classification</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:minLength value="0"/>
+                                                <xs:maxLength value="1"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="watchItem" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Watch item</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_4.chk_watch_item</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="statistics">
+                            <xs:annotation>
+                                <xs:documentation>Workorder statistics information.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" name="accident" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Accident</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_crx.accident</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="incident" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Incident</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header.incident</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="notContracted" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Not contracted</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_4.chk_not_contracted</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="requests">
+                            <xs:annotation>
+                                <xs:documentation>Workorder Requests information.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element minOccurs="0" name="engineChange" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Engine change</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.engine_change</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="hangarCosts" type="timeCostType">
+                                        <xs:annotation>
+                                            <xs:documentation>Hangar time cost.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.hangar_costs</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="towingCosts" type="timeCostType">
+                                        <xs:annotation>
+                                            <xs:documentation>Towing time cost.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.towing_costs1</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="other">
+                                        <xs:annotation>
+                                            <xs:documentation>Other code.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.other</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:minLength value="0"/>
+                                                <xs:maxLength value="36"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="rampActivity" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Ramp activity</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_4.chk_ramp</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="specialEquipement">
+                                        <xs:annotation>
+                                            <xs:documentation>Special equipment.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.spec_req_1</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:minLength value="0"/>
+                                                <xs:maxLength value="8"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="specialEquipement2">
+                                        <xs:annotation>
+                                            <xs:documentation>Special equipment 2.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.spec_req_2</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:minLength value="0"/>
+                                                <xs:maxLength value="8"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="srmRepair" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>SRM repair</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.srm_repair</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="taxi" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Taxi</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.taxi</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="weightAndBalance" type="yesNoType">
+                                        <xs:annotation>
+                                            <xs:documentation>Mass and balance required</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_crx.mass_balance_req</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="positionInfo" type="positionInfoType">
+                            <xs:annotation>
+                                <xs:documentation>Position information of the workorder.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:choice minOccurs="0">
+                            <xs:element name="transferData" type="transferDataType">
+                                <xs:annotation>
+                                    <xs:documentation>Last transfer data if workorder has been transferred.</xs:documentation>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:element name="closingData">
+                                <xs:annotation>
+                                    <xs:documentation>Closing data of the workorder if state = C (closed).</xs:documentation>
+                                </xs:annotation>
+                                <xs:complexType>
+                                    <xs:sequence>
+                                        <xs:element name="closingDate" type="simpleDateType">
+                                            <xs:annotation>
+                                                <xs:documentation>Date when the workorder was closed.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.closing_date</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="closingTime" type="simpleTimeUtcType">
+                                            <xs:annotation>
+                                                <xs:documentation>Time when the workorder was closed.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.release_time</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="closingStation" type="station">
+                                            <xs:annotation>
+                                                <xs:documentation>Station the workorder was closed.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.release_station</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="closingLeg">
+                                            <xs:annotation>
+                                                <xs:documentation>Leg when the workorder was closed.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.closing_leg</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                            </xs:annotation>
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:maxLength value="9"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="closingTah" type="positiveInteger">
+                                            <xs:annotation>
+                                                <xs:documentation>TAH at closure.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.release_tah</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="closingTac" type="positiveInteger">
+                                            <xs:annotation>
+                                                <xs:documentation>TAC at closure.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.release_tac</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element minOccurs="0" name="closingSign">
+                                            <xs:annotation>
+                                                <xs:documentation>User sign. User or mech sign is mandatory.</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE=wo_header.mech_sign</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                                            </xs:annotation>
+                                            <xs:simpleType>
+                                                <xs:restriction base="xs:string">
+                                                    <xs:maxLength value="8"/>
+                                                </xs:restriction>
+                                            </xs:simpleType>
+                                        </xs:element>
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:choice>
+                        <xs:element minOccurs="0" name="certification">
+                            <xs:annotation>
+                                <xs:documentation>Certification that the work was performed in accordance to the approval number defined in this section.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="number">
+                                        <xs:annotation>
+                                            <xs:documentation>Number of the certifying company.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.approval_number</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:maxLength value="36"/>
+                                                <xs:minLength value="1"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="date" type="simpleDateType">
+                                        <xs:annotation>
+                                            <xs:documentation>Date of the certification</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header.closing_date</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="time" type="simpleTimeUtcType">
+                                        <xs:annotation>
+                                            <xs:documentation>Time of the certification</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header.release_time</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                            <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="releaseToService">
+                            <xs:annotation>
+                                <xs:documentation>Release to service certification.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="number">
+                                        <xs:annotation>
+                                            <xs:documentation>Number of the certifying company.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.approval_number</xs:appinfo>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header_more.crs_reference</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                            <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:maxLength value="128"/>
+                                                <xs:minLength value="1"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="date" type="simpleDateType">
+                                        <xs:annotation>
+                                            <xs:documentation>Date of the certification</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header.closing_date</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="time" type="simpleTimeUtcType">
+                                        <xs:annotation>
+                                            <xs:documentation>Time of the certification</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header.release_time</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                            <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="releaseSign">
+                                        <xs:annotation>
+                                            <xs:documentation>User sign. User or mech sign is mandatory.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE=wo_header.release_sign</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:maxLength value="8"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="priority">
+                            <xs:annotation>
+                                <xs:documentation>Priority of workorder transfer.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element name="code">
+                                        <xs:annotation>
+                                            <xs:documentation>Priority code.</xs:documentation>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                            <xs:appinfo>AMOS_DATABASE_EXPORT=forecast.prio</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:minLength value="1"/>
+                                                <xs:maxLength value="4"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="sortOrder" type="xs:int">
+                                        <xs:annotation>
+                                            <xs:documentation>The sorted order of the priority.</xs:documentation>
+                                            <xs:appinfo>AMOS_DATABASE_EXPORT=wo_priority.sortorder</xs:appinfo>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        </xs:annotation>
+                                    </xs:element>
+                                    <xs:element minOccurs="0" name="description">
+                                        <xs:annotation>
+                                            <xs:documentation>Description of the priority.</xs:documentation>
+                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                            <xs:appinfo>AMOS_DATABASE_EXPORT=wo_priority.description</xs:appinfo>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:string">
+                                                <xs:minLength value="1"/>
+                                                <xs:maxLength value="36"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="workSteps">
+                <xs:annotation>
+                    <xs:documentation>Work steps of the workorder.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence maxOccurs="unbounded">
+                        <xs:element name="workStep" type="workStepType">
+                            <xs:annotation>
+                                <xs:documentation>Workorder workstep.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="originWorkorderOfFinding">
+                <xs:annotation>
+                    <xs:documentation>Origin workorder if it is a finding.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:choice>
+                        <xs:element name="uniqueWorkorderReference" type="internalReferenceType">
+                            <xs:annotation>
+                                <xs:documentation>Reference to the origin workorder.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_header.uuid</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="barcode">
+                            <xs:annotation>
+                                <xs:documentation>Barcode of origin workorder based on printed documentation.</xs:documentation>
+                                <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                            </xs:annotation>
+                            <xs:simpleType>
+                                <xs:restriction base="xs:string">
+                                    <xs:minLength value="1"/>
+                                    <xs:maxLength value="16"/>
+                                </xs:restriction>
+                            </xs:simpleType>
+                        </xs:element>
+                    </xs:choice>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="structuralDamage" type="amosReferenceExportStructuralDamage">
+                <xs:annotation>
+                    <xs:documentation>Link to structural damage based on workorder-number. EXPORT ONLY !</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=struct_damages.event_perfno_i</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=E_WO</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="references">
+                <xs:annotation>
+                    <xs:documentation>References linked to the workorder.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="reference" type="referenceType">
+                            <xs:annotation>
+                                <xs:documentation>Reference/Link attached to the workorder.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="remarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Remarks to the workorder.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_remarks.text</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid" use="optional">
+            <xs:annotation>
+                <xs:documentation>UUID of the workorder.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=wo_header.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- WORKSTEP Type -->
+    <xs:complexType name="workStepType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="workstepState">
+                <xs:annotation>
+                    <xs:documentation>State of the workstep: O = open, C = closed</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=workstep_link.workstep_state</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="1"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="headline">
+                <xs:annotation>
+                    <xs:documentation>Header/description of the workstep.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_description.header</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="70"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="description">
+                <xs:annotation>
+                    <xs:documentation>Description text.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_description.text</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="descriptionSign">
+                <xs:annotation>
+                    <xs:documentation>The sign of the user who has written or added the description.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=workstep_link.workstep_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="classifications">
+                <xs:annotation>
+                    <xs:documentation>Workstep classifications information.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="criticalTask" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.critical_task</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="etopsRelevant" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.etops_relevant</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="ewis" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.ewis</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="airworthinessDirective" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>AD - Airworthiness Directive to indicate safety and or legislative items if selected `Y` is saved</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.ad</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="statistics">
+                <xs:annotation>
+                    <xs:documentation>Workstep statistics information.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="insurance" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.insurance</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="warranty" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.warranty</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="requests">
+                <xs:annotation>
+                    <xs:documentation>Workstep requests information.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="defuel" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.defuel</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="fuelDrain" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.fuel_drain</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="externalHydraulic" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.external_hydraulic</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="powerRun" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.power_run</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="electricalPowerOff" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.electrical_power_off</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="hydraulicPowerOff" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.hydraulic_power_off</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="ndt" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.ndt</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="tankEntry" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.tank_entry</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="testFlightRequired" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.test_flight</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="idleTestRun" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.idle_run</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="troubleshooting" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Only filled if is true (Y=Yes).</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=workstep_classification.troubleshooting</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="workPhase">
+                <xs:annotation>
+                    <xs:documentation>Work phase of the workstep.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=phase.code</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="15"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="positionInfo" type="workStepPositionInfoType">
+                <xs:annotation>
+                    <xs:documentation>Position information of the workstep.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="resourceRequest">
+                <xs:annotation>
+                    <xs:documentation>Resource requests for the workstep.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="timelineFixed" type="yesNoType">
+                            <xs:annotation>
+                                <xs:documentation>Indicates if the timeline is fixed.
+NOT SUPPORTED. Section not filled on export and ignored on import.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=rm_resource_request.timeline_fixed</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="resourceRequirements">
+                            <xs:annotation>
+                                <xs:documentation>Resource requirements for the resource request.</xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                                <xs:sequence>
+                                    <xs:element maxOccurs="unbounded" name="resourceRequirement">
+                                        <xs:annotation>
+                                            <xs:documentation>Resource requirement needed to perform the workstep .</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:complexType>
+                                            <xs:sequence>
+                                                <xs:element name="resourceType">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Type of resource requirement.</xs:documentation>
+                                                        <xs:appinfo>AMOS_DATABASE=rm_resource_type.label</xs:appinfo>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                    </xs:annotation>
+                                                    <xs:simpleType>
+                                                        <xs:restriction base="xs:string">
+                                                            <xs:maxLength value="50"/>
+                                                        </xs:restriction>
+                                                    </xs:simpleType>
+                                                </xs:element>
+                                                <xs:element name="totalHours" type="integer">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Total hours required saved in quantity of minutes.</xs:documentation>
+                                                        <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.total_hours</xs:appinfo>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="quantity" type="double">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Quantity or resource required.</xs:documentation>
+                                                        <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.resource_quantity</xs:appinfo>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="duration" type="integer">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Duration calculated in quantity of minutes for each resource.</xs:documentation>
+                                                        <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.elapsed_time</xs:appinfo>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element minOccurs="0" name="timOffset" type="integer">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Time offset from the beginning of the requirement.</xs:documentation>
+                                                        <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.time_offset</xs:appinfo>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element minOccurs="0" name="classification">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Classification of the resource requirement.</xs:documentation>
+                                                        <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.status</xs:appinfo>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                    </xs:annotation>
+                                                    <xs:simpleType>
+                                                        <xs:annotation>
+                                                            <xs:documentation>ENUMERATION=BOResourceRequirement.BOResourceRequirementStatus</xs:documentation>
+                                                        </xs:annotation>
+                                                        <xs:restriction base="xs:string">
+                                                            <xs:maxLength value="64"/>
+                                                        </xs:restriction>
+                                                    </xs:simpleType>
+                                                </xs:element>
+                                                <xs:element minOccurs="0" name="constraints">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Resource requirement constraints.</xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element maxOccurs="unbounded" name="constraint">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>Constraint for the resource requirement.</xs:documentation>
+                                                                </xs:annotation>
+                                                                <xs:complexType>
+                                                                    <xs:sequence>
+                                                                        <xs:element name="propertyType">
+                                                                            <xs:annotation>
+                                                                                <xs:documentation>Type of constraint.</xs:documentation>
+                                                                                <xs:appinfo>AMOS_DATABASE=rm_property_type.label</xs:appinfo>
+                                                                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                                            </xs:annotation>
+                                                                            <xs:simpleType>
+                                                                                <xs:restriction base="xs:string">
+                                                                                    <xs:maxLength value="50"/>
+                                                                                </xs:restriction>
+                                                                            </xs:simpleType>
+                                                                        </xs:element>
+                                                                        <xs:choice>
+                                                                            <xs:element name="valueInt" type="integer">
+                                                                                <xs:annotation>
+                                                                                    <xs:documentation>Integer value for the constraint.</xs:documentation>
+                                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_constraint.int_value</xs:appinfo>
+                                                                                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                                                                                </xs:annotation>
+                                                                            </xs:element>
+                                                                            <xs:element name="valueDouble" type="double">
+                                                                                <xs:annotation>
+                                                                                    <xs:documentation>Double value for the constraint.</xs:documentation>
+                                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_constraint.double_value</xs:appinfo>
+                                                                                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                                                                                </xs:annotation>
+                                                                            </xs:element>
+                                                                            <xs:element name="valueString">
+                                                                                <xs:annotation>
+                                                                                    <xs:documentation>String value for the constraint.</xs:documentation>
+                                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_constraint.char_value</xs:appinfo>
+                                                                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                                                </xs:annotation>
+                                                                                <xs:simpleType>
+                                                                                    <xs:restriction base="xs:string">
+                                                                                        <xs:maxLength value="255"/>
+                                                                                    </xs:restriction>
+                                                                                </xs:simpleType>
+                                                                            </xs:element>
+                                                                        </xs:choice>
+                                                                    </xs:sequence>
+                                                                    <xs:attribute ref="uuid" use="optional">
+                                                                        <xs:annotation>
+                                                                            <xs:documentation>UUID of the resource requirement constraint.</xs:documentation>
+                                                                            <xs:appinfo>AMOS_DATABASE=rm_resource_constraint.uuid</xs:appinfo>
+                                                                            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                                        </xs:annotation>
+                                                                    </xs:attribute>
+                                                                </xs:complexType>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element minOccurs="0" name="signOffConfiguration">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Sign off configuration flags.</xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element minOccurs="0" name="performedSign" type="yesNoType">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>Filled if performed sign flag is true.</xs:documentation>
+                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.signoff_perform</xs:appinfo>
+                                                                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                            <xs:element minOccurs="0" name="inspection" type="yesNoType">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>Filled if inspection flag is true.</xs:documentation>
+                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.signoff_inspect</xs:appinfo>
+                                                                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                            <xs:element minOccurs="0" name="doubleInspection" type="yesNoType">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>Filled if double inspection is true.</xs:documentation>
+                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.signoff_double_inspect</xs:appinfo>
+                                                                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                                                                </xs:annotation>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                                <xs:element minOccurs="0" name="additionalTime">
+                                                    <xs:annotation>
+                                                        <xs:documentation>Additinal Time Approval data.</xs:documentation>
+                                                    </xs:annotation>
+                                                    <xs:complexType>
+                                                        <xs:sequence>
+                                                            <xs:element name="approvedBy">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>Approved sign.</xs:documentation>
+                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.approved_by</xs:appinfo>
+                                                                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                                                                </xs:annotation>
+                                                                <xs:simpleType>
+                                                                    <xs:restriction base="xs:string">
+                                                                        <xs:maxLength value="8"/>
+                                                                    </xs:restriction>
+                                                                </xs:simpleType>
+                                                            </xs:element>
+                                                            <xs:element name="approvalReason">
+                                                                <xs:annotation>
+                                                                    <xs:documentation>Approval reason of additional time.</xs:documentation>
+                                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.approval_reason</xs:appinfo>
+                                                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                                </xs:annotation>
+                                                                <xs:simpleType>
+                                                                    <xs:restriction base="xs:string">
+                                                                        <xs:maxLength value="255"/>
+                                                                    </xs:restriction>
+                                                                </xs:simpleType>
+                                                            </xs:element>
+                                                        </xs:sequence>
+                                                    </xs:complexType>
+                                                </xs:element>
+                                            </xs:sequence>
+                                            <xs:attribute ref="uuid" use="optional">
+                                                <xs:annotation>
+                                                    <xs:documentation>UUID of the resource requirement.</xs:documentation>
+                                                    <xs:appinfo>AMOS_DATABASE=rm_resource_requirement.uuid</xs:appinfo>
+                                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                </xs:annotation>
+                                            </xs:attribute>
+                                        </xs:complexType>
+                                    </xs:element>
+                                </xs:sequence>
+                            </xs:complexType>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="requiredParts">
+                <xs:annotation>
+                    <xs:documentation>Required parts for the workstep.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="partRequest" type="partRequestType">
+                            <xs:annotation>
+                                <xs:documentation>Part request needed to perform the workstep.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="doubleInspectionRequired" type="yesNoType">
+                <xs:annotation>
+                    <xs:documentation>Is a double inspection required for the workstep ?
+Only filled if is true.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_description.double_inspection_required</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="repository" type="yesNoType">
+                <xs:annotation>
+                    <xs:documentation>Is the workstep associated to the WorkStep Repository ?
+Only filled if is true.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_description.workstep_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="actions">
+                <xs:annotation>
+                    <xs:documentation>Actions done for the workstep management.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="action" type="actionType">
+                            <xs:annotation>
+                                <xs:documentation>Action to perform the workstep.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="references">
+                <xs:annotation>
+                    <xs:documentation>References linked to the workstep.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="reference" type="referenceType">
+                            <xs:annotation>
+                                <xs:documentation>Reference/Link attached to the workstep.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="remarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Remarks to the workstep.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_description.desc_comment</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid" use="optional">
+            <xs:annotation>
+                <xs:documentation>UUID of the workstep.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=wo_text_description.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- WORKSTEP POSITION INFO Type-->
+    <xs:complexType name="workStepPositionInfoType">
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="panel">
+                <xs:annotation>
+                    <xs:documentation>Panel code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=panel_code_link.panel_no</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="zone">
+                <xs:annotation>
+                    <xs:documentation>Zone code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=zone_code_link.zone</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="area">
+                <xs:annotation>
+                    <xs:documentation>Area code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=area_code_link.ac_area</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="special">
+                <xs:annotation>
+                    <xs:documentation>Special code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=special_code_link.special</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- ISSUE DATA Type-->
+    <xs:complexType name="issueType">
+        <xs:sequence>
+            <xs:element name="issueDate" type="simpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date the workorder was issued.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="issueSign">
+                <xs:annotation>
+                    <xs:documentation>User sign of the user who issued the workorder.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="issueStation" type="station">
+                <xs:annotation>
+                    <xs:documentation>Station the workorder was issued.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_station</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="issueLeg">
+                <xs:annotation>
+                    <xs:documentation>Leg the workorder was issued.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_leg</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="9"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="issueTah" type="integer">
+                <xs:annotation>
+                    <xs:documentation>TAH when workorder was issued.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_tah</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="issueTac" type="integer">
+                <xs:annotation>
+                    <xs:documentation>TAC when workorder was issued.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_tac</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="issueFltFrom" type="station">
+                <xs:annotation>
+                    <xs:documentation>Departure station of the flight.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_flt_from</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="issueFltTo" type="station">
+                <xs:annotation>
+                    <xs:documentation>Arrival/issue station of the flight.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.issue_flt_to</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- PART INFO TYPE-->
+    <xs:complexType name="partSerialNumberGroup">
+        <xs:annotation>
+            <xs:documentation>Groups a part and a serial number</xs:documentation>
+        </xs:annotation>
+        <xs:all>
+            <xs:element minOccurs="0" name="partNumber" type="partNumberType">
+                <xs:annotation>
+                    <xs:documentation>part number</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_part_on_off.partno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="serialNumber" type="serialNumberType">
+                <xs:annotation>
+                    <xs:documentation>serial number</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_part_on_off.serialno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:all>
+    </xs:complexType>
+    <!-- POSITION INFO Type-->
+    <xs:complexType name="positionInfoType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="position">
+                <xs:annotation>
+                    <xs:documentation>Position</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.ac_position</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_POSITION</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=20</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="14"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="panel">
+                <xs:annotation>
+                    <xs:documentation>Panel code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=panel_code_link.panel_no</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="zone">
+                <xs:annotation>
+                    <xs:documentation>Zone code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=zone_code_link.zone</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="area">
+                <xs:annotation>
+                    <xs:documentation>Area code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=area_code_link.ac_area</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="special">
+                <xs:annotation>
+                    <xs:documentation>Special code</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=special_code_link.special</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- ACTION Type -->
+    <xs:complexType name="actionType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="actionType" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Either: Action, Inspection or Double Inspection.
+ONLY INTERNAL !</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=action_type.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="headline">
+                <xs:annotation>
+                    <xs:documentation>Header/description of the action.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.header</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="70"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="actionText">
+                <xs:annotation>
+                    <xs:documentation>Action text.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.text</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="closingAction" type="yesNoType">
+                <xs:annotation>
+                    <xs:documentation>"Y" - if this is an action added to close a Workstep, "N" - if it is not a closing action.</xs:documentation>
+                    <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="performedData" type="performedActionType">
+                <xs:annotation>
+                    <xs:documentation>Perform data of the action.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="inspection" type="inspectActionType">
+                <xs:annotation>
+                    <xs:documentation>Inspection done after action.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="doubleInspection" type="inspectActionType">
+                <xs:annotation>
+                    <xs:documentation>Double inspection done after the first inspection.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="componentChanges">
+                <xs:annotation>
+                    <xs:documentation>Only allowed for type = Action</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="componentChange" type="componentChangeType">
+                            <xs:annotation>
+                                <xs:documentation>Component change needed to perform the action.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="timeBookings">
+                <xs:annotation>
+                    <xs:documentation>Time bookings defined for the action.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="timeBooking" type="timeBookingType">
+                            <xs:annotation>
+                                <xs:documentation>Time booking</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="uplifts">
+                <xs:annotation>
+                    <xs:documentation>Uplifts defined for the action.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="oilUplifts" type="upliftType">
+                            <xs:annotation>
+                                <xs:documentation>Oil uplifts:
+APU1, APU2, ENGINE1, ENGINE2, ENGINE3, ENGINE4, IDG1, IDG2, IDG3, IDG4, PGB1, PGB2</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="hydraulicUplifts" type="upliftType">
+                            <xs:annotation>
+                                <xs:documentation>Hydraulic uplifts:
+HYD1, HYD2, HYD3, HYD4</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="tireUplifts" type="upliftType">
+                            <xs:annotation>
+                                <xs:documentation>Tire uplifts:
+TIRE_LH1, TIRE_LH2, TIRE_LH_NOSE, TIRE_RH1, TIRE_RH2, TIRE_RH_NOSE</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="references">
+                <xs:annotation>
+                    <xs:documentation>References linked to the action.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="reference" type="referenceType">
+                            <xs:annotation>
+                                <xs:documentation>Reference/Link attached to the action.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid">
+            <xs:annotation>
+                <xs:documentation>UUID of the action.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=wo_text_action.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- INSPECTION ACTION Type (inspection and double inspection)-->
+    <xs:complexType name="inspectActionType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="headline">
+                <xs:annotation>
+                    <xs:documentation>Header/description of the inspection.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.header</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="70"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="inspectionText">
+                <xs:annotation>
+                    <xs:documentation>Inspection text.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.text</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="performedData" type="performedInspectionType">
+                <xs:annotation>
+                    <xs:documentation>Perform data of the inspection.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="remarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Remarks to the inspection.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.action_comment</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- PART REQUEST Type -->
+    <xs:complexType name="partRequestType">
+        <xs:sequence>
+            <xs:element name="partNumber" type="partNumberType">
+                <xs:annotation>
+                    <xs:documentation>Part number.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_2.partno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="description">
+                <xs:annotation>
+                    <xs:documentation>Part description.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="36"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="neededQuantity" type="quantityType">
+                <xs:annotation>
+                    <xs:documentation>Needed quantity.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_2.qty</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_QTY</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="serialNumber" type="serialNumberType">
+                <xs:annotation>
+                    <xs:documentation>Serial number of the part requested.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_info.serialno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_ROTABLE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="ipcReference">
+                <xs:annotation>
+                    <xs:documentation>IPC reference</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=oem_reference.oem_reference_string</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="80"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="priceBookNumber" type="positiveInteger">
+                <xs:annotation>
+                    <xs:documentation>Price book No for the part requested.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_info.pricebookno_i</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="locationOnAircraft">
+                <xs:annotation>
+                    <xs:documentation>Aircraft Location ID code.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_info.locid_code</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_POSITION</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="14"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="pmaAllowed" type="yesNoType">
+                <xs:annotation>
+                    <xs:documentation>Flag telling if the part to be PMA or OEM / any manufacture type.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_info.manufacture_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="propabilityOfUsage">
+                <xs:annotation>
+                    <xs:documentation>The probability if the requested parts are required (0% to 100%).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_2.percentage</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:int">
+                        <xs:minInclusive value="0"/>
+                        <xs:maxInclusive value="100"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="externallyProvisioned" type="yesNoType">
+                <xs:annotation>
+                    <xs:documentation>Flag to indicate if the provisioning of the part request is handled externally.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_2.externally_provisioned</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="remarks" type="xs:string">
+                <xs:annotation>
+                    <xs:documentation>Remarks to the part request.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=part_request_info.remarks</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="tool" type="yesNoType">
+                <xs:annotation>
+                    <xs:documentation>Flag to tell if a part is a tool.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=part.tool</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid">
+            <xs:annotation>
+                <xs:documentation>UUID of the part request.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=part_request_2.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- COMPONENT CHANGE Type-->
+    <xs:complexType name="componentChangeType">
+        <xs:sequence>
+            <xs:element name="position">
+                <xs:annotation>
+                    <xs:documentation>Position of the exchanged part.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_part_on_off.ac_position</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=M_POSITION</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=20</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="14"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="labelNumber">
+                <xs:annotation>
+                    <xs:documentation>Label number of the exchange.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_part_on_off.labelno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="11"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="partOff" type="partSerialNumberGroup">
+                <xs:annotation>
+                    <xs:documentation>The removed part and serial number.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="partOn" type="partSerialNumberGroup">
+                <xs:annotation>
+                    <xs:documentation>The installed part and serial number.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="certificateNumber">
+                <xs:annotation>
+                    <xs:documentation>Release number of the rotable.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_part_on_off.releaseno</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="40"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid">
+            <xs:annotation>
+                <xs:documentation>UUID of the action.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=wo_part_on_off.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- TIME BOOKING Type-->
+    <xs:complexType name="timeBookingType">
+        <xs:sequence>
+            <xs:element name="entityCode">
+                <xs:annotation>
+                    <xs:documentation>Unique code identifying the entity.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=entity_header.entity_code</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=F_ENTITY_CODE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="12"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="userSign">
+                <xs:annotation>
+                    <xs:documentation>The sign of the user who did proceed the booking step.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=time_captured.user_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="startDate" type="simpleDateType">
+                <xs:annotation>
+                    <xs:documentation>The date the booking step was started.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=time_captured.start_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="startTime" type="simpleTimeUtcType">
+                <xs:annotation>
+                    <xs:documentation>The time the booking step was started.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=time_captured.start_time</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="duration" type="positiveInteger">
+                <xs:annotation>
+                    <xs:documentation>The duration minutes. This is always the difference between end and start.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=time_captured.duration</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="skill">
+                <xs:annotation>
+                    <xs:documentation>The skill used by the employee to perform the work.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=time_captured.qualification</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=SKILL</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="scope">
+                <xs:annotation>
+                    <xs:documentation>The scope used to perform the work.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=time_captured.scope</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=SCOPE</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="typeOfWork">
+                <xs:annotation>
+                    <xs:documentation>The (commercial) type of work of the task.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=time_captured.type_of_work_no</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="12"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid" use="optional">
+            <xs:annotation>
+                <xs:documentation>UUID of the time booking.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=time_captured.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- QTY Type -->
+    <xs:complexType name="quantityType">
+        <xs:simpleContent>
+            <xs:extension base="double">
+                <xs:attribute name="UOM" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>Unit of measure.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE=measure_unit.measure_unit</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=M_MEASURE_UNIT</xs:appinfo>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:maxLength value="4"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <!-- performed action Type -->
+    <xs:complexType name="performedActionType">
+        <xs:annotation>
+            <xs:documentation>Performed data of an action.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="performedDate" type="simpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date of the performed action.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.action_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="performedTime" type="simpleTimeUtcType">
+                <xs:annotation>
+                    <xs:documentation>Time of the performed action.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.action_time</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="performedSign">
+                <xs:annotation>
+                    <xs:documentation>The sign of the user who has performed the action.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.sign_performed</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- performed inspection Type -->
+    <xs:complexType name="performedInspectionType">
+        <xs:annotation>
+            <xs:documentation>Performed data of an action.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="performedDate" type="simpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date of the performed action.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.action_date</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="performedTime" type="simpleTimeUtcType">
+                <xs:annotation>
+                    <xs:documentation>Time of the performed action.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.action_time</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="performedSign">
+                <xs:annotation>
+                    <xs:documentation>The sign of the user who has performed the action.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.sign_performed</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- transfer data Type -->
+    <xs:complexType name="transferDataType">
+        <xs:annotation>
+            <xs:documentation>Transfer data.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="transferDate" type="simpleDateType">
+                <xs:annotation>
+                    <xs:documentation>Date at transfer.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer.date_transfer</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="transferTime" type="simpleTimeUtcType">
+                <xs:annotation>
+                    <xs:documentation>Time at transfer.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer.transfer_time</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="transferStation">
+                <xs:annotation>
+                    <xs:documentation>Station at transfer.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer.transfer_station</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=4</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="transferReason">
+                <xs:annotation>
+                    <xs:documentation>Transfer Reason/Extension Code. (Basic Table: Maint. Events Extension Codes Event Type: W)</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer.reason_code</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="transferType">
+                <xs:annotation>
+                    <xs:documentation>Either: DD or CDL or MEL.</xs:documentation>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:enumeration value="DD"/>
+                        <xs:enumeration value="CDL"/>
+                        <xs:enumeration value="MEL"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="ataReference">
+                <xs:annotation>
+                    <xs:documentation>ATA chapter.
+ONLY in case transfer is CDL or MEL.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header_more.mel_chapter</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="24"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="melCategory">
+                <xs:annotation>
+                    <xs:documentation>MEL category (A, B, C or D) ONLY in case transfer is MEL.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_header.mel_code</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:length value="1"/>
+                        <xs:enumeration value="A"/>
+                        <xs:enumeration value="B"/>
+                        <xs:enumeration value="C"/>
+                        <xs:enumeration value="D"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="dueData">
+                <xs:annotation>
+                    <xs:documentation>Due information of the workorder.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="dueDate" type="simpleDateType">
+                            <xs:annotation>
+                                <xs:documentation>Due date of the workorder.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.due_at</xs:appinfo>
+                                <xs:appinfo>AMOS_DATABASE=forecast.expected_date</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="dueTah" type="integer">
+                            <xs:annotation>
+                                <xs:documentation>TAH due.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.due_at</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                                <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element minOccurs="0" name="dueTac" type="integer">
+                            <xs:annotation>
+                                <xs:documentation>TAC due.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.due_at</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                                <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="togoData" type="togoDataType">
+                <xs:annotation>
+                    <xs:documentation>TO-GO Counter information indicating how much is left before reaching the workorder due limits.</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="userSign">
+                <xs:annotation>
+                    <xs:documentation>User sign. User or mech sign is mandatory.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer.user_sign</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="limitations">
+                <xs:annotation>
+                    <xs:documentation>Limitations applied to the Workorder.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="limitation" type="limitationType">
+                            <xs:annotation>
+                                <xs:documentation>Workorder limitation.</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute ref="uuid" use="optional">
+            <xs:annotation>
+                <xs:documentation>UUID of the workorder transfer.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=wo_transfer.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- uplift Type -->
+    <xs:complexType name="upliftType">
+        <xs:annotation>
+            <xs:documentation>Uplift.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="uplift">
+                <xs:annotation>
+                    <xs:documentation>Tire uplift performed while executing the action.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="code" type="xs:string">
+                            <xs:annotation>
+                                <xs:documentation>Upllift code.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=fluids_uplift_comp.component_type</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                        <xs:element name="measure" type="double">
+                            <xs:annotation>
+                                <xs:documentation>Uplift amount.</xs:documentation>
+                                <xs:appinfo>AMOS_DATABASE=fluids_uplift_comp.component_uplift</xs:appinfo>
+                                <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element minOccurs="0" name="sign">
+                <xs:annotation>
+                    <xs:documentation>The sign of the user who has performed the uplifts.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_text_action.sign_performed</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="8"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <!-- Workpackage Number Complex Type -->
+    <xs:complexType name="workpackageNumberComplexType">
+        <xs:simpleContent>
+            <xs:extension base="workpackageNumberType">
+                <xs:attribute ref="uuid">
+                    <xs:annotation>
+                        <xs:documentation>UUID of the workpackage.</xs:documentation>
+                        <xs:appinfo>AMOS_DATABASE=wp_header.uuid</xs:appinfo>
+                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="barcode" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>Barcode identifying the workpackage to use on printed documentation.</xs:documentation>
+                        <xs:appinfo>AMOS_NO_DB</xs:appinfo>
+                    </xs:annotation>
+                </xs:attribute>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <!--===COMMON BUSINESS TYPES===-->
+    <!-- internalReference Type-->
+    <xs:complexType name="internalReferenceType">
+        <xs:annotation>
+            <xs:documentation>UUID of origin workorder.</xs:documentation>
+        </xs:annotation>
+        <xs:attribute ref="uuid" use="required">
+            <xs:annotation>
+                <xs:documentation>UUID of origin workorder.</xs:documentation>
+                <xs:appinfo>AMOS_DATABASE=wo_header.uuid</xs:appinfo>
+                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <!-- UUID -->
+    <xs:attribute name="uuid">
+        <xs:annotation>
+            <xs:documentation>UUID values</xs:documentation>
+            <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+        </xs:annotation>
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <!-- STATION-->
+    <xs:simpleType name="station">
+        <xs:annotation>
+            <xs:documentation>Max. 4 characters</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="4"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- AC_TYPE -->
+    <xs:simpleType name="acSimpleType">
+        <xs:annotation>
+            <xs:documentation>Use for ac register number or ac type. Max. 6 characters.</xs:documentation>
+            <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="6"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- PARTNUMBER DEFINITION -->
+    <xs:simpleType name="partNumberType">
+        <xs:annotation>
+            <xs:documentation>Type for partnumbers: minLength=1; maxLength=32;</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="32"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- SERIALNUMBER DEFINITION -->
+    <xs:simpleType name="serialNumberType">
+        <xs:annotation>
+            <xs:documentation>Type for serialnumbers: minLength=1; maxLength=20;</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="20"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- WORKPACKAGE NUMBER DEFINITION -->
+    <xs:simpleType name="workpackageNumberType">
+        <xs:restriction base="xs:string">
+            <xs:maxLength value="30"/>
+            <xs:minLength value="1"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!--==COMMON TYPES==-->
+    <!-- SIMPLE ISO8601 DATE -->
+    <xs:simpleType name="simpleDateType">
+        <xs:annotation>
+            <xs:documentation>Date type. ISO8601-date as string or empty string.</xs:documentation>
+            <xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="([12][0-9][0-9][0-9]\-((0[1-9])|(1[0-2]))\-((0[1-9])|([12][0-9])|([3][01])))"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- YES OR NO -->
+    <xs:simpleType name="yesNoType">
+        <xs:annotation>
+            <xs:documentation>Y=YES; N=NO.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="Y">
+                <xs:annotation>
+                    <xs:documentation>YES.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+            <xs:enumeration value="N">
+                <xs:annotation>
+                    <xs:documentation>NO.</xs:documentation>
+                </xs:annotation>
+            </xs:enumeration>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="timeCostType">
+        <xs:annotation>
+            <xs:documentation>Time type. Time duration as string or empty string.</xs:documentation>
+            <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+            <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]{2,7}[:][0-5][0-9]"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- SIMPLE UTC TIME -->
+    <xs:simpleType name="simpleTimeUtcType">
+        <xs:annotation>
+            <xs:documentation>Time type. UTC-time as string or empty string.</xs:documentation>
+            <xs:appinfo>AMOS_MIMETYPE=D_TIME</xs:appinfo>
+            <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:pattern value="(([01][0-9][:][0-5][0-9])|(2[0-3][:][0-5][0-9]))"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <!-- NUMBERS SPECIFIC DEFINITIONS-->
+    <xs:simpleType name="positiveInteger">
+        <xs:annotation>
+            <xs:documentation>Zero or positive integer</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="0"/>
+            <xs:maxInclusive value="2147483647"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="integer">
+        <xs:restriction base="xs:integer">
+            <xs:minInclusive value="-2147483648"/>
+            <xs:maxInclusive value="2147483647"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="double">
+        <xs:annotation>
+            <xs:documentation>Limited to 17 digits overall</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:decimal">
+            <xs:totalDigits value="17"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="additionnalTogoType">
+        <xs:choice>
+            <xs:element name="calendarDuration">
+                <xs:annotation>
+                    <xs:documentation>Special togo counter with value expressed in Calendar value.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.togo_interval</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_NUMERIC_IMPORT</xs:appinfo>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:duration">
+                            <xs:attribute name="dimensionCode" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>Counter dimension name of the togo value</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_EXPORT=counter_definition.code</xs:appinfo>
+                                    <xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                </xs:annotation>
+                            </xs:attribute>
+                            <xs:attribute name="dimensionName" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>Counter dimension name of the togo value</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_EXPORT=counter_definition.name</xs:appinfo>
+                                    <xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                </xs:annotation>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="amountInteger">
+                <xs:annotation>
+                    <xs:documentation>Special togo counter with value expressed in integer.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.togo_interval</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:int">
+                            <xs:attribute name="dimensionCode" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>Counter dimension name of the togo value</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_EXPORT=counter_definition.code</xs:appinfo>
+                                    <xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                </xs:annotation>
+                            </xs:attribute>
+                            <xs:attribute name="dimensionName" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>Counter dimension name of the togo value</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_EXPORT=counter_definition.name</xs:appinfo>
+                                    <xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                </xs:annotation>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="amountDecimal">
+                <xs:annotation>
+                    <xs:documentation>Special togo counter with value expressed in decimal.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.togo_interval</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:simpleContent>
+                        <xs:extension base="xs:double">
+                            <xs:attribute name="dimensionCode" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>Counter dimension name of the togo value</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_EXPORT=counter_definition.code</xs:appinfo>
+                                    <xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                </xs:annotation>
+                            </xs:attribute>
+                            <xs:attribute name="dimensionName" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>Counter dimension name of the togo value</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_EXPORT=counter_definition.name</xs:appinfo>
+                                    <xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                </xs:annotation>
+                            </xs:attribute>
+                        </xs:extension>
+                    </xs:simpleContent>
+                </xs:complexType>
+            </xs:element>
+        </xs:choice>
+    </xs:complexType>
+    <xs:complexType name="togoDataType">
+        <xs:sequence>
+            <xs:element minOccurs="0" name="togoDays" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>Days togo.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.togo_interval</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="togoTah" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>TAH togo.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.togo_interval</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element minOccurs="0" name="togoTac" type="xs:int">
+                <xs:annotation>
+                    <xs:documentation>TAC togo.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE=wo_transfer_dimension.togo_interval</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_NUMERIC_EXPORT</xs:appinfo>
+                </xs:annotation>
+            </xs:element>
+            <xs:element maxOccurs="unbounded" minOccurs="0" name="additionnalTogo" type="additionnalTogoType">
+                <xs:annotation>
+                    <xs:documentation>additional togo values</xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="consequenceType">
+        <xs:sequence>
+            <xs:element name="code">
+                <xs:annotation>
+                    <xs:documentation>Consequence code the limitation belongs to.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=limitation_type.consequences</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string"/>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="description">
+                <xs:annotation>
+                    <xs:documentation>Consequence code description the limitation belongs to.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=moc_conseq_types.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string"/>
+                </xs:simpleType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="limitationType">
+        <xs:sequence>
+            <xs:element name="limitationType">
+                <xs:annotation>
+                    <xs:documentation>Type of the limitation (e.g. ETOPS, AUTOLAND).</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=limitation_type.limitation_type</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="20"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element name="limitationValue">
+                <xs:annotation>
+                    <xs:documentation>Limitation value.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=limitation_type.limitation_value</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                    <xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT=20</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:minLength value="1"/>
+                        <xs:maxLength value="6"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="description">
+                <xs:annotation>
+                    <xs:documentation>Description of the limitation.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=limitation_type.description</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="40"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="category">
+                <xs:annotation>
+                    <xs:documentation>Category the limitation remains to.</xs:documentation>
+                    <xs:appinfo>AMOS_DATABASE_EXPORT=limitation_type.category</xs:appinfo>
+                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                </xs:annotation>
+                <xs:simpleType>
+                    <xs:restriction base="xs:string">
+                        <xs:maxLength value="20"/>
+                        <xs:minLength value="1"/>
+                    </xs:restriction>
+                </xs:simpleType>
+            </xs:element>
+            <xs:element minOccurs="0" name="consequences">
+                <xs:annotation>
+                    <xs:documentation>Consequences as code with description.</xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" name="consequence" type="consequenceType">
+                            <xs:annotation>
+                                <xs:documentation>Limitation consequences of a workorder</xs:documentation>
+                            </xs:annotation>
+                        </xs:element>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+    </xs:complexType>
+</xs:schema>
