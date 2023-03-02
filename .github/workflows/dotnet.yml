@@ -26,3 +26,8 @@ jobs:
       run: dotnet build --no-restore
     - name: Test
       run: dotnet test --no-build --verbosity normal
+    - name: Deploy
+      run: 
+      - ts=$(date +"%Y.%m.%d.%H%M")
+      - dotnet pack AMOS/AMOS.csproj /p:PackageVersion=$ts --configuration Release
+      - dotnet nuget push AMOS/bin/Release/*.nupkg --source https://api.nuget.org/v3/index.json --api-key $ApiKey
