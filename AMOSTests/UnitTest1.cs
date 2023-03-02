@@ -18,6 +18,7 @@ using AMOS.Models.TRANSFER_SHIPMENT.v1_2;
 using AMOS.Models.TRANSFER_SHIPMENT.v0_1;
 using System.Xml.Serialization;
 using System.Xml;
+using AMOS.Models.TRANSFER_SCAN.v1_0;
 
 namespace AMOSTests
 {
@@ -237,6 +238,50 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void TransferScan_PassesFile_ReturnsExpectedValue()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_SCAN_1_0.xml")));
+            var scan = transportEnvelope.GetPayload<AMOS.Models.TRANSFER_SCAN.v1_0.transferScan_1_0>();
+            var doc = scan.document.FirstOrDefault();
+            Assert.AreEqual("Cert Scan", doc.title);
+            Assert.AreEqual("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", doc.documentReference);
+            Assert.AreEqual("TEST DATA", doc.metadata.FirstOrDefault().name);
+            Assert.AreEqual("TEST VALUE", doc.metadata.FirstOrDefault().value);
+
+            if (doc.Item is AMOS.Models.TRANSFER_SCAN.v1_0.transferScanDocumentAmosDocument)
+            {
+                var scanDoc = (AMOS.Models.TRANSFER_SCAN.v1_0.transferScanDocumentAmosDocument)doc.Item;
+                Assert.AreEqual("", scanDoc.Item);
+                Assert.AreEqual("", scanDoc.ItemElementName);
+                Assert.AreEqual("", scanDoc.type);
+            }
+        }
+
+        [TestMethod]
+        public void TransferScanOnly_PassesFile_ReturnsExpectedValue()
+        {
+            var byteArray = File.ReadAllBytes("TRANSFER_SCAN_NOENV.xml");
+
+            XmlSerializer serializer = new XmlSerializer(typeof(AMOS.Models.TRANSFER_SCAN.v1_0.transferScan_1_0));
+            MemoryStream memStream = new MemoryStream(byteArray);
+            var file = (AMOS.Models.TRANSFER_SCAN.v1_0.transferScan_1_0)serializer.Deserialize(memStream);
+            var doc = file.document.FirstOrDefault();
+            Assert.AreEqual("Cert Scan", doc.title);
+            Assert.AreEqual("https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf", doc.documentReference);
+            Assert.AreEqual("TEST DATA", doc.metadata.FirstOrDefault().name);
+            Assert.AreEqual("TEST VALUE", doc.metadata.FirstOrDefault().value);
+
+            if (doc.Item is AMOS.Models.TRANSFER_SCAN.v1_0.transferScanDocumentAmosDocument)
+            {
+                var scanDoc = (AMOS.Models.TRANSFER_SCAN.v1_0.transferScanDocumentAmosDocument)doc.Item;
+                Assert.AreEqual("", scanDoc.Item);
+                Assert.AreEqual("", scanDoc.ItemElementName);
+                Assert.AreEqual("", scanDoc.type);
+            }
+
+        }
+
+        [TestMethod]
         public void FromZip_PassZipWithTwoFiles_ReturnsTransferOrder()
         {
             using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_0_14.zip"))
@@ -271,6 +316,39 @@ namespace AMOSTests
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("transfer_shipment.xml")));
             Assert.AreEqual("RETSHIP_111X1222", transportEnvelope.GetPayload<transferShipment_0_1>().shipment.First().awbNumber);
+        }
+
+        [TestMethod]
+        public void ToXml_OutputsScan()
+        {
+            var transferDoc = new transferScan_1_0();
+            transferDoc.version = "1.0";
+            transferDoc.document = new List<transferScanDocument>()
+            {
+                new transferScanDocument()
+                {
+                    documentReference = "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+                    title = "Cert Scan"
+                }
+            }.ToArray();
+
+            XmlSerializer serializer = new XmlSerializer(typeof(transferScan_1_0));
+            var transferScanXml = "scanDoc";
+
+
+            using (var sww = new StringWriter())
+            {
+                using (XmlWriter writer = XmlWriter.Create(sww))
+                {
+                    serializer.Serialize(writer, transferDoc);
+                    transferScanXml = sww.ToString();
+
+                }
+            }
+
+            File.WriteAllText("tempscan.xml", transferScanXml);
+
+            Assert.AreEqual(transferScanXml.Contains("scanDoc"), false);
         }
 
         [TestMethod]

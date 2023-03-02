@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2011 (XCOI) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 0.1 - AMOS 9.70
+09/12/2007 - created
+
+Version 0.2 - AMOS 10.10
+17/05/2011 - added AMOS document reference.
+26/07/2011 - adapted documentation
+08/10/2013 - added field mappings
+24/03/2014 - added AMOS mime type annotations
+
+Version 1.0 - AMOS 11.40
+02/03/2017 - added attributes <uuid> + <void> on the <document> level.
+02/03/2017 - added field <printMode>
+31/03/2017 - added fields <amosDocument>/<displayValue> and <amosDocument>/<uuid>
+15/11/2019 - Enhanced documentation
+***AMOS_CHANGELOG_END*** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" attributeFormDefault="unqualified" elementFormDefault="unqualified" version="0.1">
+    <!-- TRANSFER SCAN ROOT -->
+    <xs:element name="transferScan">
+        <xs:annotation>
+            <xs:documentation>This structure can be used to import a list of external documents into AMOS, for example scanned documents stored on an external archiving system. 
+				The external system delivering this data has to provide for every document a unique "document reference" that AMOS can store. 
+				When a user wants to open a linked document this reference is then passed back to the external system to retrieve a scanned document 
+				for a given document reference or to open the linked document in an external web browser. 
+				Additionally to the document reference a title can be set for every document and a list of metadata values can be provided. 
+				The metadata fields are used to identify different document types and to extract 
+				information that is needed by AMOS to find the data element that will own the created link. 
+				Normally this metadata is extracted by the external system from the scanned images per OCR.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence maxOccurs="unbounded" minOccurs="0">
+                <xs:element name="document">
+                    <xs:annotation>
+                        <xs:documentation>A document description for a scanned document. An XML file can contain 0..n document nodes. 
+						Every document can have a optional title and a list of metadata values.</xs:documentation>
+                    </xs:annotation>
+                    <!-- DOCUMENT TYPE-->
+                    <xs:complexType>
+                        <xs:sequence minOccurs="0">
+                            <xs:element name="documentReference">
+                                <xs:annotation>
+                                    <xs:documentation>A reference number, link or ID for a scanned document. The format of this reference can be freely chosen by the external system. 
+A document reference has to be unique in the external system.</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.doc_id</xs:appinfo>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.destination_key</xs:appinfo>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link_dest_param.param_name</xs:appinfo>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link_dest_param.param_value</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=200,255,600</xs:appinfo>
+                                </xs:annotation>
+                                <!-- DOC REF TYPE-->
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string"/>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="title" type="xs:string">
+                                <xs:annotation>
+                                    <xs:documentation>An optional title for the scanned document. 
+This title will be used by AMOS as description for a created link if available.</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.link_description</xs:appinfo>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.description</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=120,255</xs:appinfo>
+                                </xs:annotation>
+                            </xs:element>
+                            <xs:choice>
+                                <xs:element name="amosDocument">
+                                    <xs:annotation>
+                                        <xs:documentation>AMOS document the external document refers to.</xs:documentation>
+                                    </xs:annotation>
+                                    <xs:complexType>
+                                        <xs:sequence>
+                                            <xs:element name="type" type="xs:string">
+                                                <xs:annotation>
+                                                    <xs:documentation>The AMOS MimeType Code of the document. E.g. "ORDER" for AMOS orders.</xs:documentation>
+                                                    <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.amos_typ</xs:appinfo>
+                                                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.source_type</xs:appinfo>
+                                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                    <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=8,10</xs:appinfo>
+                                                </xs:annotation>
+                                            </xs:element>
+                                            <xs:choice>
+                                                <xs:element name="number" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The AMOS unique ID (AMOS primary key) of the document. E.g. internal order number (orderno_i).</xs:documentation>
+                                                        <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.amos_id</xs:appinfo>
+                                                        <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.source_pk</xs:appinfo>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                        <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=32,40</xs:appinfo>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="displayValue" type="xs:string">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The AMOS unique user ID (AMOS user value) of the document. E.g. displayed order number (orderno).</xs:documentation>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                        <xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+                                                    </xs:annotation>
+                                                </xs:element>
+                                                <xs:element name="uuid">
+                                                    <xs:annotation>
+                                                        <xs:documentation>The AMOS UUID (Universal Unique Identifier) of the document, typically used in XML exchanges.</xs:documentation>
+                                                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                        <xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+                                                    </xs:annotation>
+                                                    <xs:simpleType>
+                                                        <xs:restriction base="xs:string">
+                                                            <xs:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+                                                        </xs:restriction>
+                                                    </xs:simpleType>
+                                                </xs:element>
+                                            </xs:choice>
+                                        </xs:sequence>
+                                    </xs:complexType>
+                                </xs:element>
+                                <xs:element name="barcode" type="xs:string">
+                                    <xs:annotation>
+                                        <xs:documentation>A barcode for the scanned document. 
+This barcode can be used by AMOS to identify where to link the document to existing objects.</xs:documentation>
+                                        <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.amos_typ</xs:appinfo>
+                                        <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.source_type</xs:appinfo>
+                                        <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.amos_id</xs:appinfo>
+                                        <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.source_pk</xs:appinfo>
+                                        <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                        <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=8,10,32,40</xs:appinfo>
+                                    </xs:annotation>
+                                </xs:element>
+                            </xs:choice>
+                            <xs:element maxOccurs="unbounded" minOccurs="0" name="metadata">
+                                <xs:annotation>
+                                    <xs:documentation>A metadata definition for a document consisting of a name and a corresponding value.
+Metadata elements are allowed to appear multiple times with the same "name".</xs:documentation>
+                                </xs:annotation>
+                                <!-- METADATA TYPE-->
+                                <xs:complexType>
+                                    <xs:all>
+                                        <xs:element name="name" type="xs:string">
+                                            <xs:annotation>
+                                                <xs:documentation>Name of the metadata. 
+As of AMOS 19.12, only scanOperator and scanStation are supported.</xs:documentation>
+                                                <xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                        <xs:element name="value" type="xs:string">
+                                            <xs:annotation>
+                                                <xs:documentation>Value of the metadata</xs:documentation>
+                                                <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.operator[name=`scanOperator`]</xs:appinfo>
+                                                <xs:appinfo>AMOS_DATABASE_IMPORT=document_inbox.scan_station[name=`scanStation`]</xs:appinfo>
+                                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                                <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=32</xs:appinfo>
+                                            </xs:annotation>
+                                        </xs:element>
+                                    </xs:all>
+                                </xs:complexType>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="printMode">
+                                <xs:annotation>
+                                    <xs:documentation>Define the print mode value: 
+YY = Print allowed (Default print) 
+YN = Print allowed (Default do not print) 
+NN = Print not allowed (Default do not print)
+
+Default value if the field is not set: NN</xs:documentation>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.print_mode</xs:appinfo>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                </xs:annotation>
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:enumeration value="YY"/>
+                                        <xs:enumeration value="YN"/>
+                                        <xs:enumeration value="NN"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                            <xs:element minOccurs="0" name="linkClassification">
+                                <xs:annotation>
+                                    <xs:documentation>Classification of the link. By default the value OR (Original document) is used. Values can be customized in Basic Data Administration</xs:documentation>
+                                    <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                    <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.classification</xs:appinfo>
+                                </xs:annotation>
+                                <xs:simpleType>
+                                    <xs:restriction base="xs:string">
+                                        <xs:maxLength value="2"/>
+                                        <xs:minLength value="1"/>
+                                    </xs:restriction>
+                                </xs:simpleType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute ref="uuid">
+                            <xs:annotation>
+                                <xs:documentation>Unique identifier of the link to the archived document.</xs:documentation>
+                                <xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+                                <xs:appinfo>AMOS_DATABASE_IMPORT=db_link.uuid</xs:appinfo>
+                            </xs:annotation>
+                        </xs:attribute>
+                        <xs:attribute name="void" type="xs:boolean">
+                            <xs:annotation>
+                                <xs:documentation>Indicates if the record should be deleted or not</xs:documentation>
+                                <xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+                            </xs:annotation>
+                        </xs:attribute>
+                    </xs:complexType>
+                </xs:element>
+            </xs:sequence>
+            <xs:attribute fixed="1.0" name="version" use="required">
+                <xs:annotation>
+                    <xs:documentation>Version identifier of this schema.</xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+    </xs:element>
+    <!-- UUID -->
+    <xs:attribute name="uuid">
+        <xs:annotation>
+            <xs:documentation>UUID values</xs:documentation>
+            <xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT=36</xs:appinfo>
+        </xs:annotation>
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+</xs:schema>

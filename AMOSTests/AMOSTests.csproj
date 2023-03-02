@@ -47,6 +47,12 @@
     <None Update="TRANSFER_RECEIVING_1_1.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TRANSFER_SCAN_1_0.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="TRANSFER_SCAN_NOENV.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="transfer_shipment_0_1.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
