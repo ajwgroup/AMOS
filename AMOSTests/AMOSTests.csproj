@@ -44,6 +44,9 @@
     <None Update="TRANSFER_PART_DEFINITION_6773E010000.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TRANSFER_RECEIVING_1_2.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TRANSFER_RECEIVING_1_1.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

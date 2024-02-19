@@ -47,4 +47,10 @@
     <None Include="Models\TRANSFER_PART\v0_14\transferPart_0_14.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Models\TRANSFER_RECEIVING\v1_2\transferReceiving_1.2.xsd">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

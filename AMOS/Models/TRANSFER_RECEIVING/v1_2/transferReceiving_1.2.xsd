@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2005 (XPIS) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 0.1
+	07/05/2009 - Created
+	22/09/2009 - Changed maxLength from 8 to 12 on field <location>
+Version 0.11
+	20/11/2009 - Added <recDetailNoI> and <lastMutator> on <item>
+	30/12/2009 - changed quantity to double
+Version 0.12
+	08/07/2010 - VECH - Added element <bookingDate> (created_date) to <receivingHeader>
+	19/07/2011 - VECH - Made <location> element in header optional. (#52'066)
+Version 1.0
+	05/01/2012 - XCOI - Refactored quantity handling
+Version 1.01
+	05/10/2013 - XCOI - Enlarged fields <rotable>/<certificateCompany> and <location> 
+Version 1.02
+	24/01/2014 - YSRZ - required value attribute 'base' in the <partNumber> element changed to 'transferPartDefinition'.
+	24/03/2014 - XCOI - adapted mime type annotations
+	30/06/2014 - XCOI - enhanced field descriptions
+	25/01/2017 - Enhanced database mappings	
+Version 1.1 - AMOS 11.40
+04/05/2017 - Part numbers up to 32 characters are supported for the <partNumber> field.
+Version 1.2 - AMOS 22.12
+24/08/2022 - Location length from 16 characters to 20 was changed.
+
+***AMOS_CHANGELOG_END***-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="0.1">
+	<xs:element name="transferReceiving">
+		<xs:annotation>
+			<xs:documentation>Root element for transferReceiving form.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="receiving" type="receivingType" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="version" use="required" fixed="1.2"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- REFERENCED DOCUMENTS -->
+	<xs:complexType name="amosReferenceTransferShipment">
+		<xs:simpleContent>
+			<xs:extension base="positiveInteger">
+				<xs:attribute name="base" use="required" fixed="transferShipment"/>
+				<xs:attribute name="referenceDocument" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="amosReferenceTransferOrder">
+		<xs:simpleContent>
+			<xs:extension base="orderNumberType">
+				<xs:attribute name="base" use="required" fixed="transferOrder"/>
+				<xs:attribute name="referenceDocument" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="amosReferenceTransferPart">
+		<xs:simpleContent>
+			<xs:extension base="partNumberType">
+				<xs:attribute name="base" use="required" fixed="transferPartDefinition"/>
+				<xs:attribute name="referenceDocument" type="xs:string" use="optional">
+					<xs:annotation>
+						<xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+					</xs:annotation>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- REFERENCED DOCUMENTS FINISHED-->
+	<!--COMMON TYPES-->
+	<!-- SIMPLE ISO8601 DATE -->
+	<xs:simpleType name="simpleDateType">
+		<xs:annotation>
+			<xs:documentation>Date type. ISO8601-date as string or empty string.</xs:documentation>
+			<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([12][0-9][0-9][0-9]\-((0[1-9])|(1[0-2]))\-((0[1-9])|([12][0-9])|([3][01])))?"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- YES OR NO -->
+	<xs:simpleType name="yesNoType">
+		<xs:annotation>
+			<xs:documentation>Y=YES; N=NO.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Y">
+				<xs:annotation>
+					<xs:documentation>YES.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="N">
+				<xs:annotation>
+					<xs:documentation>NO.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRIMITIVE TYPES -->
+	<xs:simpleType name="positiveInteger">
+		<xs:annotation>
+			<xs:documentation>Zero or positive integer</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:integer">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="2147483647"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="double">
+		<xs:annotation>
+			<xs:documentation>Limited to 17 digits overall</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:decimal">
+			<xs:totalDigits value="17"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- STATION -->
+	<xs:simpleType name="station">
+		<xs:annotation>
+			<xs:documentation>Max. 4 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- STORE -->
+	<xs:simpleType name="store">
+		<xs:annotation>
+			<xs:documentation>Max. 8 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- LOCATION -->
+	<xs:simpleType name="location">
+		<xs:annotation>
+			<xs:documentation>Max. 20 characters</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- USER SIGN -->
+	<xs:simpleType name="userSignSimpleType">
+		<xs:annotation>
+			<xs:documentation>Any user sign. Max. 8 characters.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="8"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PARTNUMBER DEFINITION -->
+	<xs:simpleType name="partNumberType">
+		<xs:annotation>
+			<xs:documentation>Type for partnumbers: minLength=1; maxLength=32;</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="32"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--PARTSERIALNUMBER DEFINITION -->
+	<xs:simpleType name="partSerialNumberType">
+		<xs:annotation>
+			<xs:documentation>Type for part-serialnumbers: minLength=1; maxLength=20</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--ORDER NUMBER-->
+	<xs:simpleType name="orderNumberType">
+		<xs:restriction base="xs:string">
+			<xs:maxLength value="12"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRICE TYPE DEFINITION -->
+	<xs:complexType name="priceType">
+		<xs:annotation>
+			<xs:documentation>Pricing information.</xs:documentation>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="double">
+				<xs:attribute name="internationalCurrencyCode" use="required">
+					<xs:annotation>
+						<xs:documentation>The currency of the price.</xs:documentation>
+						<xs:appinfo>AMOS_DATABASE_EXPORT=currency.currency</xs:appinfo>
+						<xs:appinfo>AMOS_MIMETYPE=D_CURRENCY</xs:appinfo>
+						<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="3"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- STATION STORE LOCATION 
+	<xs:group name="stationStoreLocationType">
+		<xs:sequence>
+			<xs:element name="station" type="xs:string">
+				<xs:annotation>
+					<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="store" type="xs:string" minOccurs="0"/>
+			<xs:element name="location" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:group> -->
+	<!-- QTY Type -->
+	<xs:complexType name="quantityType">
+		<xs:simpleContent>
+			<xs:extension base="xs:decimal">
+				<xs:attribute name="UOM" use="optional">
+					<xs:annotation>
+						<xs:documentation>Measure unit code. (AMOS 4 characters long code for a predefined measure unit.)</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=M_MEASURE_UNIT</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_EXPORT=measure_unit.measure_unit</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<!-- COMMON TYPES FINISHED-->
+	<!-- receivingTransfer -->
+	<xs:complexType name="receivingType">
+		<xs:sequence>
+			<xs:element name="id">
+				<xs:annotation>
+					<xs:documentation>Either receivingNumber or pickslipNumber must be filled</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="receivingNumber" type="positiveInteger">
+							<xs:annotation>
+								<xs:documentation>Reference to the receiving header</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.receivingno</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="pickslipNumber">
+							<xs:annotation>
+								<xs:documentation>Reference to the pickslip</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=M_PICKSLIP</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=history.voucherno</xs:appinfo>
+								<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="10"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="receivingHeader" type="receivingHeaderType"/>
+			<xs:element name="items" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Received items</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="item" type="itemType" maxOccurs="unbounded"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="itemType">
+		<xs:sequence>
+			<xs:element name="partNumber" type="amosReferenceTransferPart">
+				<xs:annotation>
+					<xs:documentation>Part number</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.partno</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="partType">
+				<xs:annotation>
+					<xs:documentation>Type of the part</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="rotable">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="serialNumber" type="partSerialNumberType" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Required if not on quarantine location.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.serialno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.serialno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.serialno</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="labelNumber" type="positiveInteger" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>The new label number of the received rotable.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.labelno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.labelno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.labelno</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="certificateType" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>not filled</xs:documentation>
+											<xs:appinfo>AMOS_NOT_FILLED</xs:appinfo>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:maxLength value="6"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="certificateCompany" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Certificate company</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.certificate_company</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.certificate_company</xs:appinfo>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:maxLength value="12"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="certificateDate" type="simpleDateType" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Date of the certificate</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.certificate_date</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="certificateNumber" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>The release number</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.releaseno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.releaseno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.releaseno</xs:appinfo>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:maxLength value="40"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="nonrotable">
+							<xs:annotation>
+								<xs:documentation>Section for non-rotable parts</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="batchNumber" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Required if not on quarantine location.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.batchno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.batchno</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.batchno</xs:appinfo>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:minLength value="1"/>
+												<xs:maxLength value="20"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="quantity" type="quantityType">
+										<xs:annotation>
+											<xs:documentation>Quantity and unit of measure as handled in AMOS.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_QTY</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.qty</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="externalQuantity" type="quantityType">
+										<xs:annotation>
+											<xs:documentation>External quantity and unit of measure used in the order.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_QTY</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.ext_qty</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="materialClass" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Material class: R=rotable, C=consumable etc...</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=MAT_CLASS</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.mat_class</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.mat_class</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.mat_class</xs:appinfo>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:maxLength value="4"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="expireDate" type="simpleDateType" minOccurs="0">
+										<xs:annotation>
+											<xs:documentation>Expiry date</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.expire_date</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.expire_date</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.expire_date</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="origin">
+				<xs:annotation>
+					<xs:documentation>Origin of the receiving</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:choice>
+						<xs:element name="order">
+							<xs:annotation>
+								<xs:documentation>If the origin is an order</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="orderNumber" type="amosReferenceTransferOrder">
+										<xs:annotation>
+											<xs:documentation>Reference to the order.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=M_ORDER</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_header.orderno</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+									<xs:element name="orderPosition" type="positiveInteger">
+										<xs:annotation>
+											<xs:documentation>Position in the pickslip.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=od_detail.posno</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+						<xs:element name="pickslip">
+							<xs:annotation>
+								<xs:documentation>If the origin is a pickslip</xs:documentation>
+							</xs:annotation>
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="pickslipNumber">
+										<xs:annotation>
+											<xs:documentation>Reference to the pickslip.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=M_PICKSLIP</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=history.voucherno</xs:appinfo>
+											<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+										</xs:annotation>
+										<xs:simpleType>
+											<xs:restriction base="xs:string">
+												<xs:maxLength value="10"/>
+											</xs:restriction>
+										</xs:simpleType>
+									</xs:element>
+									<xs:element name="position" type="positiveInteger">
+										<xs:annotation>
+											<xs:documentation>Position in the pickslip.</xs:documentation>
+											<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+											<xs:appinfo>AMOS_DATABASE_EXPORT=pickslip_booked.recno</xs:appinfo>
+										</xs:annotation>
+									</xs:element>
+								</xs:sequence>
+							</xs:complexType>
+						</xs:element>
+					</xs:choice>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="condition" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Condition of the part.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.condition</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.condition</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.condition</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="2"/>
+						<xs:minLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="purchasePrice" type="priceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Purchase price of the part per each in internal currency</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_MON</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.order_price</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.purch_price</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.purch_price</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="discount" type="double" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Discount.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.discount</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.discount</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="customsType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The customs type. The basic table customs_type contains all possible values for this column.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.customs_type</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="customsNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The customs number.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.customsno</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.customsno</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="24"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="manufacturedDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The manufacture date of the received part</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.mfg_date</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.mfg_date</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="fromLocation" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Filled if pickslip receiving</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="station" type="station" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Originating station for the part</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=pickslip_header.station_from</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="store" type="store" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Originating store for the part</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=A_STORE</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=pickslip_header.store_from</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="location" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>In special cases (e.g. "direct consumption") there is no location information available.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="station" type="station">
+							<xs:annotation>
+								<xs:documentation>Last station of the part</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=history.station</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="store" type="store">
+							<xs:annotation>
+								<xs:documentation>Last store of the part</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=A_STORE</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=history.store</xs:appinfo>
+								<xs:appinfo>AMOS_CHECKED_LENGTH_EXPORT</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="location" type="location">
+							<xs:annotation>
+								<xs:documentation>Last location of the part</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=M_LOCATION</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_EXPORT=history.location</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="isQuarantine" type="yesNoType" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Y if this item is on quarantine. Otherwise N.</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+								<xs:appinfo>AMOS_NO_DB_EXPORT</xs:appinfo>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="owner" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Owner of the part</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=history.owner</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.owner</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.owner</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="operator" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Operator for the part</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.operator</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.operator</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="12"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="recDetailNoI" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Unique internal AMOS number.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.recdetailno_i</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="lastMutator" type="userSignSimpleType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>User sign of person that performed the last change</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=A_USER_SIGN</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_detail.mutator</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_quarantine.mutator</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="receivingHeaderType">
+		<xs:annotation>
+			<xs:documentation>Header of a receiving</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="deliveryDate" type="simpleDateType">
+				<xs:annotation>
+					<xs:documentation>Date of delivery</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.del_date</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="bookingDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Date the receiving record was created in the system.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.created_date</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shipment" type="amosReferenceTransferShipment" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Reference to the shipment.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_SHIPMENT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.shipmentno_i</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="awbNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The airwaybill number of the package.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.awbno</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="24"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="awbDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The airwaybill date of the package.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.awb_date</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="packDate" type="simpleDateType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The packlist date.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.packlistdate</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="packListNumber" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The packlist number.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.packlistno</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:maxLength value="15"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="remarks" type="xs:string" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Remarks</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=od_rec_header.remarks</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
