@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Models\TRANSFER_ORDER\v1_5\" />
     <Folder Include="Models\TRANSFER_PART_DEFINITION\v1_0\" />
     <Folder Include="Models\TRANSFER_SHIPMENT\v1_4\" />
   </ItemGroup>

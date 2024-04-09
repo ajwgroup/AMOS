@@ -53,6 +53,13 @@ namespace AMOSTests
             Assert.AreEqual("PX0000001", transportEnvelope.GetPayload<AMOS.Models.TRANSFER_ORDER.v1_4.transferOrder_1_4>().order.First().orderNumber);
         }
 
+        [TestMethod]
+        public void TransferOrderFromXmlOrderHeader15_PassesFile_ReturnsExpectedValueForOrder()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER_1_5.xml")));
+            Assert.AreEqual("PX0000001", transportEnvelope.GetPayload<AMOS.Models.TRANSFER_ORDER.v1_4.transferOrder_1_4>().order.First().orderNumber);
+        }
+
 
         [TestMethod]
         public void TransferOrderFromXmlPart_PassesFile_ReturnsExpectedValueForOrder()
@@ -326,6 +333,16 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void FromZip_PassZipWithTwoFiles_ReturnsTransferOrder15()
+        {
+            using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_1_5.zip"))
+            {
+                var transportEnvelope = EnvelopeUtils.FromZip<transportEnvelope_0_1>(fileStream);
+                Assert.AreEqual("2022-09-02", transportEnvelope.FirstOrDefault(e => e.Key.Equals("TRANSFER_ORDER.xml")).Value.GetPayload<AMOS.Models.TRANSFER_ORDER.v1_5.transferOrder_1_5>().order.First().orderDetail.First().targetDate);
+            }
+        }
+
+        [TestMethod]
         public void FromZip_PassZipWithTwoFiles_ReturnsTransferPart()
         {
             using (FileStream fileStream = File.OpenRead("TRANSFER_ORDER_0_14.zip"))
@@ -479,6 +496,13 @@ namespace AMOSTests
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER_1_4.xml")));
             Assert.AreEqual(1.4, transportEnvelope.GetVersion("transferOrder"));
+        }
+
+        [TestMethod]
+        public void GetVersion_TransferOrder_ShouldReturn1_5()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_ORDER_1_5.xml")));
+            Assert.AreEqual(1.5, transportEnvelope.GetVersion("transferOrder"));
         }
 
         [TestMethod]
