@@ -1163,7 +1163,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         private string dateField;
 
-        private string aircraftRegistrationField;
+        private aircraftDetailsType aircraftDetailsField;
 
         private string orderNumberField;
 
@@ -1263,15 +1263,15 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string aircraftRegistration
+        public aircraftDetailsType aircraftDetails
         {
             get
             {
-                return this.aircraftRegistrationField;
+                return this.aircraftDetailsField;
             }
             set
             {
-                this.aircraftRegistrationField = value;
+                this.aircraftDetailsField = value;
             }
         }
 
@@ -1623,6 +1623,205 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class aircraftDetailsType
+    {
+
+        private string aircraftFullRegistrationField;
+
+        private amosReferenceTransferAircraft aircraftRegistrationField;
+
+        private string aircraftMsnField;
+
+        private string aircraftTypeField;
+
+        private string aircraftSubTypeField;
+
+        private string aircraftModelField;
+
+        private string operatorField;
+
+        private string ownerField;
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string aircraftFullRegistration
+        {
+            get
+            {
+                return this.aircraftFullRegistrationField;
+            }
+            set
+            {
+                this.aircraftFullRegistrationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public amosReferenceTransferAircraft aircraftRegistration
+        {
+            get
+            {
+                return this.aircraftRegistrationField;
+            }
+            set
+            {
+                this.aircraftRegistrationField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string aircraftMsn
+        {
+            get
+            {
+                return this.aircraftMsnField;
+            }
+            set
+            {
+                this.aircraftMsnField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string aircraftType
+        {
+            get
+            {
+                return this.aircraftTypeField;
+            }
+            set
+            {
+                this.aircraftTypeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string aircraftSubType
+        {
+            get
+            {
+                return this.aircraftSubTypeField;
+            }
+            set
+            {
+                this.aircraftSubTypeField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string aircraftModel
+        {
+            get
+            {
+                return this.aircraftModelField;
+            }
+            set
+            {
+                this.aircraftModelField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string @operator
+        {
+            get
+            {
+                return this.operatorField;
+            }
+            set
+            {
+                this.operatorField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string owner
+        {
+            get
+            {
+                return this.ownerField;
+            }
+            set
+            {
+                this.ownerField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    public partial class amosReferenceTransferAircraft
+    {
+
+        private string baseField;
+
+        private string referenceDocumentField;
+
+        private string valueField;
+
+        public amosReferenceTransferAircraft()
+        {
+            this.baseField = "transferAircraft";
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string @base
+        {
+            get
+            {
+                return this.baseField;
+            }
+            set
+            {
+                this.baseField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string referenceDocument
+        {
+            get
+            {
+                return this.referenceDocumentField;
+            }
+            set
+            {
+                this.referenceDocumentField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlTextAttribute()]
+        public string Value
+        {
+            get
+            {
+                return this.valueField;
+            }
+            set
+            {
+                this.valueField = value;
+            }
+        }
+    }
+
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.8.3928.0")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
     public partial class InstalledType
     {
 
@@ -1634,7 +1833,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         private string dateField;
 
-        private string aircraftRegistrationField;
+        private aircraftDetailsType aircraftDetailsField;
 
         private int labelNumberField;
 
@@ -1720,15 +1919,15 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string aircraftRegistration
+        public aircraftDetailsType aircraftDetails
         {
             get
             {
-                return this.aircraftRegistrationField;
+                return this.aircraftDetailsField;
             }
             set
             {
-                this.aircraftRegistrationField = value;
+                this.aircraftDetailsField = value;
             }
         }
 
@@ -1931,7 +2130,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         private string dateField;
 
-        private string aircraftRegistrationField;
+        private aircraftDetailsType aircraftDetailsField;
 
         private decimal tsnField;
 
@@ -2035,15 +2234,15 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string aircraftRegistration
+        public aircraftDetailsType aircraftDetails
         {
             get
             {
-                return this.aircraftRegistrationField;
+                return this.aircraftDetailsField;
             }
             set
             {
-                this.aircraftRegistrationField = value;
+                this.aircraftDetailsField = value;
             }
         }
 
@@ -2370,7 +2569,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         private string dateField;
 
-        private string aircraftRegistrationField;
+        private aircraftDetailsType aircraftDetailsField;
 
         private string orderNumberField;
 
@@ -2424,15 +2623,15 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string aircraftRegistration
+        public aircraftDetailsType aircraftDetails
         {
             get
             {
-                return this.aircraftRegistrationField;
+                return this.aircraftDetailsField;
             }
             set
             {
-                this.aircraftRegistrationField = value;
+                this.aircraftDetailsField = value;
             }
         }
 
@@ -3253,7 +3452,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         private int positionField;
 
-        private string aircraftRegistrationField;
+        private aircraftDetailsType aircraftDetailsField;
 
         private string aircraftReceiverField;
 
@@ -3369,15 +3568,15 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_0
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string aircraftRegistration
+        public aircraftDetailsType aircraftDetails
         {
             get
             {
-                return this.aircraftRegistrationField;
+                return this.aircraftDetailsField;
             }
             set
             {
-                this.aircraftRegistrationField = value;
+                this.aircraftDetailsField = value;
             }
         }
 
