@@ -144,7 +144,16 @@
 				</orderHeader>
 				<orderDetail>
 					<position>1</position>
-					<aircraftRegistration>DEN</aircraftRegistration>
+					<aircraftDetails>
+						<aircraftFullRegistration>G-AJAJ</aircraftFullRegistration>
+						<aircraftRegistration>DEN</aircraftRegistration>
+						<aircraftMsn>1111</aircraftMsn>
+						<aircraftType>A32X</aircraftType>
+						<aircraftSubType>-111</aircraftSubType>
+						<aircraftModel>A319</aircraftModel>
+						<operator>AJW</operator>
+						<owner>AJW</owner>
+					</aircraftDetails>
 					<detailState>O</detailState>
 					<detailStatus>0</detailStatus>
 					<extendedState>D</extendedState>
