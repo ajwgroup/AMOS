@@ -17,17 +17,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Extensions\**" />
     <Compile Remove="Models\12-10-067\**" />
     <Compile Remove="Models\12-20-054\**" />
     <Compile Remove="Models\19.12-preview19\**" />
     <Compile Remove="Models\19.6.18\**" />
-    <EmbeddedResource Remove="Extensions\**" />
     <EmbeddedResource Remove="Models\12-10-067\**" />
     <EmbeddedResource Remove="Models\12-20-054\**" />
     <EmbeddedResource Remove="Models\19.12-preview19\**" />
     <EmbeddedResource Remove="Models\19.6.18\**" />
-    <None Remove="Extensions\**" />
     <None Remove="Models\12-10-067\**" />
     <None Remove="Models\12-20-054\**" />
     <None Remove="Models\19.12-preview19\**" />
