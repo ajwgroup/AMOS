@@ -1,2 +1,1 @@
-
-
+Legacy amos mapping service
