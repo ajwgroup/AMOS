@@ -75,6 +75,9 @@
     <None Update="TRANSFER_SHIPMENT_1_2.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="TRANSFER_SHIPMENT_1_6.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="TRANSFER_SHIPMENT_1_4.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

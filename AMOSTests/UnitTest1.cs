@@ -443,6 +443,13 @@ namespace AMOSTests
         }
 
         [TestMethod]
+        public void FromXml_ReturnsTransferShipment1_6()
+        {
+            var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_SHIPMENT_1_6.xml")));
+            Assert.AreEqual(AMOS.Models.TRANSFER_SHIPMENT.v1_6.shipmentHeaderTypeShipmentType.EO, transportEnvelope.GetPayload<AMOS.Models.TRANSFER_SHIPMENT.v1_6.transferShipment_1_6>().shipment.First().shipmentHeader.shipmentType);
+        }
+
+        [TestMethod]
         public void FromXml_ReturnsTransferWorkorder2_6()
         {
             var transportEnvelope = EnvelopeUtils.FromXml<transportEnvelope_0_1>(Encoding.UTF8.GetBytes(File.ReadAllText("TRANSFER_WORKORDER_2_6.xml")));
