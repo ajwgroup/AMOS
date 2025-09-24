@@ -23,7 +23,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v1_4
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     [System.Xml.Serialization.XmlRootAttribute(ElementName = "transferOrder", Namespace = "", IsNullable = false)]
-    public partial class transferOrder_1_4
+    public partial class transferOrder_1_4 : ITransferOrder
     {
 
         private OrderType[] orderField;
@@ -69,7 +69,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v1_4
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class OrderType
+    public partial class OrderType : ITransferOrderOrderType
     {
 
         private string orderNumberField;
