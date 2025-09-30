@@ -25,7 +25,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v1_2
     public partial class transferOrder_1_2 : ITransferOrder
     {
 
-        private orderType[] orderField;
+        private OrderType[] orderField;
 
         private string versionField;
 
@@ -36,7 +36,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v1_2
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute("order", Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public orderType[] order
+        public OrderType[] order
         {
             get
             {
@@ -68,7 +68,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v1_2
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class orderType : ITransferOrderOrderType
+    public partial class OrderType : ITransferOrderOrderType
     {
 
         private string orderNumberField;
