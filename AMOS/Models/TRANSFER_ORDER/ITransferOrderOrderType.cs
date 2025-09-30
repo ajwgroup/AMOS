@@ -6,5 +6,6 @@ namespace AMOS.Models.TRANSFER_ORDER
 {
     public interface ITransferOrderOrderType
     {
+        string orderNumber { get; set; }
     }
 }
