@@ -141,7 +141,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v1_2
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class orderHeaderType
+    public partial class orderHeaderType : ITransferOrderOrderHeaderType
     {
 
         private string orderTypeField;

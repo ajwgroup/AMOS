@@ -143,7 +143,7 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_1
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class OrderHeaderType
+    public partial class OrderHeaderType : ITransferOrderOrderHeaderType
     {
 
         private string orderTypeField;
@@ -219,20 +219,6 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_1
             set
             {
                 this.orderTypeField = value;
-            }
-        }
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
-        public string orderState
-        {
-            get
-            {
-                return this.orderStateField;
-            }
-            set
-            {
-                this.orderStateField = value;
             }
         }
 
