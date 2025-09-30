@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd. -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com -->
+<!-- SWISS AviationSoftware, 2012 (VECH) -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 1.0 - AMOS 12.20
+27/07/2018 - created
+
+Version 1.1 - AMOS 19.12
+06/06/2019 - External Shipment Number extended to 15 characters
+***AMOS_CHANGELOG_END***-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:sas="http://www.swiss-as.com/XML" elementFormDefault="unqualified" attributeFormDefault="unqualified" version="0.41">
+	<!-- transferShipmentStatus -->
+	<xs:element name="transferShipmentStatus">
+		<xs:annotation>
+			<xs:documentation>This layout can be used to import / export shipment statuses information to / from AMOS.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence minOccurs="0" maxOccurs="unbounded">
+				<xs:element name="shipmentStatus" type="shipmentStatusContentType">
+					<xs:annotation>
+						<xs:documentation>The shipment statuses information.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" use="required" fixed="1.1"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- PRIMITIVE TYPES -->
+	<xs:simpleType name="positiveInteger">
+		<xs:annotation>
+			<xs:documentation>Zero or positive integer</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="0"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="uuidType">
+		<xs:annotation>
+			<xs:documentation>Uuid values</xs:documentation>
+			<xs:appinfo>AMOS_CHECKED_LENGTH_IMPORT</xs:appinfo>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="barcodeType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="awbNumberType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="24"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="externalShipmentNumberType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="15"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="shipmentStatusType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="shipmentDetailStatusType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+			<xs:maxLength value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="detailNumberType">
+		<xs:restriction base="xs:string">
+			<xs:minLength value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- PRIMITIVE TYPES finished -->
+	<!-- shipmentStatusContentType -->
+	<xs:complexType name="shipmentStatusContentType">
+		<xs:sequence>
+			<xs:element name="shipmentStatusHeader" type="shipmentStatusHeaderType">
+				<xs:annotation>
+					<xs:documentation>The shipment status header.</xs:documentation>
+					<xs:appinfo/>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shipmentStatusDetails" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The shipment status details.</xs:documentation>
+					<xs:appinfo/>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence maxOccurs="unbounded">
+						<xs:element name="shipmentStatusDetail" type="shipmentStatusDetailType">
+							<xs:annotation>
+								<xs:documentation>The shipment status detail content.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<!-- shipmentStatusHeaderType-->
+	<xs:complexType name="shipmentStatusHeaderType">
+		<xs:sequence>
+			<xs:element name="identification" type="identificationType">
+				<xs:annotation>
+					<xs:documentation>At least one identification field must be set for import. Maximum fields are set for export.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shipmentStatus" type="shipmentStatusType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The shipment status.
+Applicable for incoming and outgoing shipment:
+	O=OPEN,
+	C=CLOSED,
+	A=ARRIVED,
+	S=SENT,
+	RP=READY_TO_BE_PICKED_UP
+
+Only applicable for incoming shipments:
+	P=PARTLY_ARRIVED,
+	M=MISSING,
+	PM=PARTLY_MISSING,
+	RR=PARTLY_READY,
+	PS=PARTLY_SENT
+
+For compatibility reasons:
+	T=TRANSFER,
+	R=RECEIVED,
+	X=PARTLY_RECEIVED,
+	U=UNKNOWN
+For deletion purpose:
+	D=DELETE	
+	</xs:documentation>
+					<xs:documentation>EXPORT or INSERT, with UPDATE, or DELETE</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=sh_header.state</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="uuid" type="uuidType">
+			<xs:annotation>
+				<xs:documentation>The internal uuid of the shipment.</xs:documentation>
+				<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				<xs:appinfo>AMOS_DATABASE=sh_header.uuid</xs:appinfo>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<!-- identificationType -->
+	<xs:complexType name="identificationType">
+		<xs:all>
+			<xs:element name="awbNumber" type="awbNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The shipment's air waybill number.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=sh_header.awbno</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_IMPORT=sh_header.awbno</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="externalShipmentNumber" type="externalShipmentNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The identifier of the shipment defined by another system.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE=sh_header.ext_shipmentno</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="barcode" type="barcodeType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The shipment's barcode.</xs:documentation>
+					<xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="internalShipmentNumber" type="positiveInteger" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The shipment unique identification number.</xs:documentation>
+					<xs:documentation>EXPORT ONLY</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_SHIPMENT3</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=sh_header.shipmentno_i</xs:appinfo>
+					<xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!-- shipmentStatusDetailType -->
+	<xs:complexType name="shipmentStatusDetailType">
+		<xs:sequence>
+			<xs:element name="detailNumber" type="detailNumberType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>The internal number of the shipment detail.</xs:documentation>
+					<xs:documentation>EXPORT ONLY</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_INTEGER</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=sh_detail.shipdetailno_i</xs:appinfo>
+					<xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="detailStatus" type="shipmentDetailStatusType">
+				<xs:annotation>
+					<xs:documentation>The shipment detail status.
+Applicable for incoming and outgoing shipment detail:
+	O=OPEN,
+	C=CLOSED,
+	A=ARRIVED,
+	S=SENT,
+	RP=READY_TO_BE_PICKED_UP
+
+Only applicable for incoming shipment details:
+	M=MISSING
+
+For compatibility reasons:
+	T=TRANSFER,
+	R=RECEIVED,
+	U=UNKNOWN</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+					<xs:appinfo>AMOS_DATABASE_EXPORT=sh_detail.state</xs:appinfo>
+					<xs:appinfo>AMOS_NOT_IMPORTED</xs:appinfo>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+		<xs:attribute name="uuid" type="uuidType">
+			<xs:annotation>
+				<xs:documentation>Uuid of the detail.</xs:documentation>
+				<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+				<xs:appinfo>AMOS_DATABASE=sh_detail.uuid</xs:appinfo>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+</xs:schema>

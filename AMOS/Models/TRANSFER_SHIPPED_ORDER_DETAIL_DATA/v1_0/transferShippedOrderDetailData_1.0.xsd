@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited by Swiss AviationSoftware Ltd. (Swiss AviationSoftware Ltd.) -->
+<!-- Swiss AviationSoftware Ltd.
+P.O.Box, CH-4002 Basel, Switzerland
+http://www.swiss-as.com -->
+<!-- ***AMOS_AUTO_GENERATION*** -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 1.0 - AMOS 24.6
+03/01/2024 - AHEI - Initial version
+2024-10-01 - Introduced complex types to limit length of generated resources
+***AMOS_CHANGELOG_END*** -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="transferShippedOrderDetailData">
+		<xs:annotation>
+			<xs:documentation>Root of the schema.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="shippedData" maxOccurs="unbounded">
+					<xs:annotation>
+						<xs:documentation>Shipped Order Detail data group</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="shipment" minOccurs="0">
+								<xs:annotation>
+									<xs:documentation>Shipment data</xs:documentation>
+								</xs:annotation>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="awbNumber" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>AWB Number of the outgoing shipment.</xs:documentation>
+												<xs:appinfo>AMOS_MIMETYPE=M_AWB</xs:appinfo>
+												<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_header.awbno</xs:appinfo>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="24"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="awbDate" type="xs:date" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>AWB Date of the outgoing shipment.</xs:documentation>
+												<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+												<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_header.awb_date</xs:appinfo>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="shipmentNumber" type="xs:int" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation>Corresponding AMOS shipment.</xs:documentation>
+												<xs:appinfo>AMOS_MIMETYPE=M_SHIPMENT3</xs:appinfo>
+												<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_header.shipmentno_i</xs:appinfo>
+											</xs:annotation>
+										</xs:element>
+										<xs:element name="shipmentDetailUUID">
+											<xs:annotation>
+												<xs:documentation>UUID of the shipment detail</xs:documentation>
+												<xs:appinfo>AMOS_DATABASE_EXPORT=sh_detail.uuid</xs:appinfo>
+												<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+											</xs:annotation>
+											<xs:simpleType>
+												<xs:restriction base="xs:string">
+													<xs:minLength value="1"/>
+													<xs:maxLength value="36"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="shippedOrderDetailData" type="shippedOrderDetailDataType" maxOccurs="unbounded">
+								<xs:annotation>
+									<xs:documentation>Shipped Order Detail data section.</xs:documentation>
+								</xs:annotation>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" use="required" fixed="1.0">
+				<xs:annotation>
+					<xs:documentation>Schema version.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="certificateInformation">
+		<xs:annotation>
+			<xs:documentation>Certificate information of the prereceived part.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="certificateType" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Type of certificate. Must exist in AMOS.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=M_CERTIFICATE_TYPE_INT</xs:appinfo>
+						<xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="4"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="certificateDate" type="xs:date" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Date of the certificate.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.certificate_date</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="formTrackingNumber" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Certificate number.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=certificate.form_tracking_no</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="32"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="certifyingCompany" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Address code of the certifying company. Must exist in AMOS.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.certificate_company</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="12"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="partInformation">
+		<xs:annotation>
+			<xs:documentation>Information on the shipped part.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="partNumber">
+					<xs:annotation>
+						<xs:documentation>Part Number. If different from the one ordered, should be an authorized alternate.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=M_PART</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.partno</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="32"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="partOwner" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Owner of the part. Address code must exist in AMOS.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=A_VENDOR</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.owner</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="12"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:choice>
+					<xs:element name="serialNumber" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Serial Number of the shipped part.</xs:documentation>
+							<xs:appinfo>AMOS_MIMETYPE=M_SERIAL_NUMBER</xs:appinfo>
+							<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.serialno_batchno</xs:appinfo>
+						</xs:annotation>
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:minLength value="1"/>
+								<xs:maxLength value="20"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="batchNumberInformation" minOccurs="0">
+						<xs:annotation>
+							<xs:documentation>Batch number information.</xs:documentation>
+						</xs:annotation>
+						<xs:complexType>
+							<xs:sequence>
+								<xs:element name="batchNumber" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Batch Number of the shipped part.</xs:documentation>
+										<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.serialno_batchno</xs:appinfo>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail_batch.serialno_batchno</xs:appinfo>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:minLength value="1"/>
+											<xs:maxLength value="20"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+								<xs:element name="supplierBatchNumber" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Supplier Batch Number of the shipped part if provided</xs:documentation>
+										<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.supplier_batchno</xs:appinfo>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail_batch.supplier_batchno</xs:appinfo>
+									</xs:annotation>
+									<xs:simpleType>
+										<xs:restriction base="xs:string">
+											<xs:minLength value="1"/>
+											<xs:maxLength value="20"/>
+										</xs:restriction>
+									</xs:simpleType>
+								</xs:element>
+							</xs:sequence>
+						</xs:complexType>
+					</xs:element>
+				</xs:choice>
+				<xs:element name="partCondition" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Condition of the part. Must exist in AMOS.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=G_CONDITION</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.rec_condition</xs:appinfo>
+					</xs:annotation>
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:minLength value="1"/>
+							<xs:maxLength value="2"/>
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:element>
+				<xs:element name="hasPartManufacturerApproval" type="xs:boolean" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Flag indicating if the shipped part has a Part Manufacturer Approval.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.is_pma</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="manufacturingDate" type="xs:date" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Manufacture date of the shipped part.</xs:documentation>
+						<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+						<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.mfg_date</xs:appinfo>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="expiryInformation" minOccurs="0">
+					<xs:annotation>
+						<xs:documentation>Section to identify the order in AMOS.</xs:documentation>
+					</xs:annotation>
+					<xs:complexType>
+						<xs:sequence>
+							<xs:choice>
+								<xs:element name="expiryDate" type="xs:date" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Expiry Date.</xs:documentation>
+										<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.expire_date</xs:appinfo>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="useManufacturingDate" type="xs:boolean" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>If true, expiry date is calculated with MFG Date plus maximum storage time.</xs:documentation>
+										<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.use_mfgdate</xs:appinfo>
+									</xs:annotation>
+								</xs:element>
+								<xs:element name="hasUnlimitedExpiryDate" type="xs:boolean" minOccurs="0">
+									<xs:annotation>
+										<xs:documentation>Flag indicating if the shipped part has an unlimited expiry date.</xs:documentation>
+										<xs:appinfo>AMOS_MIMETYPE=D_BOOLEAN</xs:appinfo>
+										<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.is_nolimit</xs:appinfo>
+									</xs:annotation>
+								</xs:element>
+							</xs:choice>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:complexType name="shippedOrderDetailDataType">
+		<xs:sequence>
+			<xs:element name="orderReference">
+				<xs:annotation>
+					<xs:documentation>Section to identify the order in AMOS.</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="customerOrderNumber">
+							<xs:annotation>
+								<xs:documentation>Customer`s Order Number from where the flow started.</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+								<xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="12"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="orderUUID">
+							<xs:annotation>
+								<xs:documentation>UUID of the order.</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+								<xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:maxLength value="36"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="orderPositionNumber">
+				<xs:annotation>
+					<xs:documentation>Order detail position number.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_ORDER_DETAIL</xs:appinfo>
+					<xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minExclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="station" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Station location where the part is received. Station must exist in AMOS.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=A_STATION</xs:appinfo>
+					<xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="unitOfMeasure" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>AMOS Internal measure unit as defined on the order.</xs:documentation>
+					<xs:documentation>Not imported. The unit of measure used to perform the receiving is the one declared on the order.
+A validation will return an error in case this field does not correspond to the unit of measure stored on the order.</xs:documentation>
+					<xs:appinfo>AMOS_MIMETYPE=M_MEASURE_UNIT</xs:appinfo>
+					<xs:appinfo>AMOS_NO_DB_IMPORT</xs:appinfo>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="4"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element ref="certificateInformation" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Certificate information about the shipped part.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="shippedOrderDetailItemData" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation>Shipped Order Detail item data section</xs:documentation>
+				</xs:annotation>
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element ref="certificateInformation" minOccurs="0" maxOccurs="unbounded">
+							<xs:annotation>
+								<xs:documentation>Certificate information about the shipped part.</xs:documentation>
+							</xs:annotation>
+						</xs:element>
+						<xs:element name="customsNumber" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Customs Number.</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=D_TEXT</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail.customsno</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:string">
+									<xs:minLength value="1"/>
+									<xs:maxLength value="24"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element name="quantity" minOccurs="0">
+							<xs:annotation>
+								<xs:documentation>Quantity to receive. Unit of measure must correspond to the preReceivingLine unit of measure.</xs:documentation>
+								<xs:appinfo>AMOS_MIMETYPE=D_DOUBLE</xs:appinfo>
+								<xs:appinfo>AMOS_DATABASE_IMPORT=od_rec_pre_detail_batch.qty</xs:appinfo>
+							</xs:annotation>
+							<xs:simpleType>
+								<xs:restriction base="xs:double">
+									<xs:minExclusive value="0"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:element>
+						<xs:element ref="partInformation" minOccurs="0"/>
+					</xs:sequence>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>

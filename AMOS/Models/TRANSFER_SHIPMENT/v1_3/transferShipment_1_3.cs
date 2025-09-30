@@ -25,7 +25,7 @@
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     [System.Xml.Serialization.XmlRootAttribute(ElementName = "transferShipment", Namespace = "", IsNullable = false)]
-    public partial class transferShipment_1_3
+    public partial class transferShipment_1_3 : ITransferShipment
     {
 
         private transferShipmentShipment[] shipmentField;

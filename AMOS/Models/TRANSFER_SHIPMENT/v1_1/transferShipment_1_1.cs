@@ -23,7 +23,7 @@ namespace AMOS.Models.TRANSFER_SHIPMENT.v1_1
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
     [System.Xml.Serialization.XmlRootAttribute(ElementName = "transferShipment", Namespace = "", IsNullable = false)]
-    public partial class transferShipment_1_1
+    public partial class transferShipment_1_1 : ITransferShipment
     {
 
         private shipmentType[] shipmentField;
