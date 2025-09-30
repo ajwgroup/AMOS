@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Swiss AviationSoftware Ltd.         -->
+<!-- P.O.Box, CH-4002 Basel, Switzerland -->
+<!-- http://www.swiss-as.com             -->
+<!-- SWISS AviationSoftware, 2021        -->
+<!-- ***AMOS_AUTO_GENERATION***          -->
+<!-- ***AMOS_CHANGELOG_START***
+Version 1.1 - AMOS 21.12
+- 12/09/2021 - Added fields <conversationID>, <amosVersion> and <instanceType>
+
+Version 1.0 - AMOS 12.10
+- 29/11/2017 - Created.
+***AMOS_CHANGELOG_END***-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xs:import namespace="http://www.w3.org/2000/09/xmldsig#" schemaLocation="xmldsig_2000_09_3.00.xsd"/>
+	<!-- AMOS Transport envelope Object -->
+	<xs:element name="amosTransportEnvelope">
+		<xs:annotation>
+			<xs:documentation>AMOS transport form with optional single digital signature.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="header" type="headerType">
+					<xs:annotation>
+						<xs:documentation>Header portion of the form.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+				<xs:element name="payload" type="payloadType">
+					<xs:annotation>
+						<xs:documentation>Payload transported within the form. The documents payload will be validated separately.</xs:documentation>
+					</xs:annotation>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="version" type="xs:string" use="required" fixed="1.0"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- PAYLOAD Object -->
+	<xs:complexType name="payloadType" mixed="true">
+		<xs:annotation>
+			<xs:documentation>Payload type</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:any processContents="skip" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="id" type="xs:string">
+			<xs:annotation>
+				<xs:documentation>Identifier of the payload, used to build and validate the digital signature.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="type" type="xs:string" use="required">
+			<xs:annotation>
+				<xs:documentation>Type of the included payload. E.g. transferAircraft for A/C-data. Only valid AMOS-schema-types can be used here.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="version" type="xs:string"/>
+	</xs:complexType>
+	<!-- HEADER Object-->
+	<xs:complexType name="headerType">
+		<xs:annotation>
+			<xs:documentation>Standard Header-type.</xs:documentation>
+		</xs:annotation>
+		<xs:all>
+			<xs:element name="senderID" type="identityType">
+				<xs:annotation>
+					<xs:documentation>Senders unique ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="receiverID" type="identityType">
+				<xs:annotation>
+					<xs:documentation>Receivers unique ID.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="conversationID" type="xs:string">
+				<xs:annotation>
+					<xs:documentation>Unique identifier for the message using the pattern: AMOS_[Current timestamp in milliseconds]</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="date" type="headerDateType">
+				<xs:annotation>
+					<xs:documentation>Date and time the form was sent in UTC.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="command" nillable="true" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Command applied to the payload.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="NEW">
+							<xs:annotation>
+								<xs:documentation>Command-code to create NEW data.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="UPDATE">
+							<xs:annotation>
+								<xs:documentation>Command-code to UPDATE data.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+						<xs:enumeration value="DELETE">
+							<xs:annotation>
+								<xs:documentation>Command-code to DELETE data.</xs:documentation>
+							</xs:annotation>
+						</xs:enumeration>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="amosVersion" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Version of the AMOS instance generating this envelope. Example 20.12.35 for the 35th release of AMOS 20.12</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="6"/>
+						<xs:maxLength value="30"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="instanceType" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Type of the AMOS instance generating the envelope: PROD, TEST or TRAINING</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="PROD"/>
+						<xs:enumeration value="TEST"/>
+						<xs:enumeration value="TRAINING"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element ref="dsig:Signature" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation>Digital signature over the payload (or one inner identified element).</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<!--IDENTITY Object -->
+	<xs:simpleType name="identityType">
+		<xs:annotation>
+			<xs:documentation>Type for identities (e.g. Persons, MFGs, Senders, Recipients): minLength=2, maxLength=20.</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:minLength value="2"/>
+			<xs:maxLength value="20"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!-- HeaderDate Object -->
+	<xs:complexType name="headerDateType">
+		<xs:annotation>
+			<xs:documentation>Date and time type for statements in UTC.</xs:documentation>
+			<xs:appinfo>AMOS_MIMETYPE=D_DATE</xs:appinfo>
+		</xs:annotation>
+		<xs:simpleContent>
+			<xs:extension base="xs:dateTime">
+				<xs:attribute name="timezone" type="xs:string" use="required" fixed="UTC"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+</xs:schema>
