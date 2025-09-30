@@ -4,9 +4,8 @@ using System.Text;
 
 namespace AMOS.Models.TRANSFER_ORDER
 {
-    public class ITransferOrderOrderHeaderType
+    public interface ITransferOrderOrderHeaderType
     {
-
-        public string orderState { get; set; }
+        string orderState { get; set; }
     }
 }

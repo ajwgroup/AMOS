@@ -224,6 +224,21 @@ namespace AMOS.Models.TRANSFER_ORDER.v2_1
 
         /// <remarks/>
         [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
+        public string orderState
+        {
+            get
+            {
+                return this.orderStateField;
+            }
+
+            set
+            {
+                this.orderStateField = value;
+            }
+        }
+
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute(Form = System.Xml.Schema.XmlSchemaForm.Unqualified)]
         public int orderStatus
         {
             get
