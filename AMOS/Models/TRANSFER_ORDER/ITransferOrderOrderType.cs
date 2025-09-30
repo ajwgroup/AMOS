@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AMOS.Models.TRANSFER_ORDER
 {
-    internal interface ITransferOrderOrderType
+    public interface ITransferOrderOrderType
     {
     }
 }
