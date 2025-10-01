@@ -8,6 +8,5 @@ namespace AMOS.Models.TRANSFER_SHIPMENT
     public interface ITransferShipmentShipmentHeaderType
     {
         int shipmentNumber { get; set; }
-        shipmentHeaderTypeShipmentStatus shipmentStatus { get; set; }
     }
 }
