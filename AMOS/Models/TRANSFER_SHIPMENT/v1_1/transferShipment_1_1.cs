@@ -69,7 +69,7 @@ namespace AMOS.Models.TRANSFER_SHIPMENT.v1_1
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class shipmentType
+    public partial class shipmentType : ITransferShipmentType
     {
 
         private string awbNumberField;

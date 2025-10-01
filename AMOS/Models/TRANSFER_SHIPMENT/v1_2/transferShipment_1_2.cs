@@ -97,7 +97,7 @@
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class shipmentType
+    public partial class shipmentType : ITransferShipmentType
     {
 
         private shipmentHeaderType shipmentHeaderField;
