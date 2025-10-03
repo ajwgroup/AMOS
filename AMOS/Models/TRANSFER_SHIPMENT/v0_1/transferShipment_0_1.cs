@@ -1167,7 +1167,7 @@
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class shipmentDetailTypeOrderInformation
+    public partial class shipmentDetailTypeOrderInformation : IShipmentDetailTypeOrderInformation
     {
 
         private string amosOrderNumberField;
