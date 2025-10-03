@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AMOS.Models.TRANSFER_SHIPMENT
 {
-    internal interface ITransferShipmentShipmentItems
+    public interface ITransferShipmentShipmentItems
     {
     }
 }
