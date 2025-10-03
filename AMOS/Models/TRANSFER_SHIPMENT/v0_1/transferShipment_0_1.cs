@@ -1562,7 +1562,7 @@
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true)]
-    public partial class shipmentTypeShipmentItems
+    public partial class shipmentTypeShipmentItems : ITransferShipmentShipmentItems
     {
 
         private object itemField;
