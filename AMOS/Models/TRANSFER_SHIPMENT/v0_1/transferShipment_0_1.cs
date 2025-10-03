@@ -532,7 +532,7 @@
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class shipmentPackageType
+    public partial class shipmentPackageType : ITransferShipmentShipmentPackageType
     {
 
         private string packingNumberField;
@@ -997,7 +997,7 @@
     [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
-    public partial class shipmentDetailType
+    public partial class shipmentDetailType : ITransferShipmentShipmentDetailType
     {
 
         private string detailNumberField;
