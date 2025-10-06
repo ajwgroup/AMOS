@@ -7,6 +7,5 @@ namespace AMOS.Models.TRANSFER_SHIPMENT
     public interface IShipmentDetailTypeOrderInformation
     {
         string amosOrderNumber { get; set; }
-        int orderPosition { get; set; }
     }
 }
